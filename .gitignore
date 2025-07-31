@@ -3,3 +3,7 @@ node_modules
 # CDK asset staging directory
 .cdk.staging
 cdk.out
+
+IDEAS.md
+ROUTES_TO_DEVELOP.md
+DUMMY_EVENT.json
