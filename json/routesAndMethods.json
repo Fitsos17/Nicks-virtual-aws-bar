@@ -3,6 +3,10 @@
     {
       "route": "/",
       "methods": ["GET"]
+    },
+    {
+      "route": "catalog",
+      "methods": ["GET"]
     }
   ]
 }

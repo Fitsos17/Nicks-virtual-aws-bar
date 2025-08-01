@@ -29,3 +29,18 @@ I will use AWS services and the AWS Javascript CDK
 4. SQS queue for creating orders and give them to the barmen
 5. Eventbridge for payments (if implemented)
 6. Additional AI stuff (such as bedrock and lex for a small chatbot that could be used as a waiter)
+
+## Any suggestions?
+
+If you watched this project and you want to make a suggestion, fell free to make an issue. Else, if you want to
+fork it and make any changes, make sure you check these first:
+
+1. routesAndMethods.json
+   - Here you add in a json format the route and the methods you want to add. `{ "route": 'name', "methods": [ ...methods ] }`
+   - The value of the "route" key MUST be the name of the new route you want to create without the "/" in front of it.
+   - The value of the "methods" key MUST be an array of methods (in capital words) even if there is only one method.
+2. functions folder
+   - Here you add all of the lambda function code.
+   - Every new function must have the name of the route that supports (ex. catalog.js would be a function for the /catalog route) and must start with `exports.handler = async(event) => {return {...}}`
+3. lambda-functions.js
+   - Add to the constructor the following code below the " //IMPLEMENT " comment: `this.{name}Function = this.#createLambdaFunction("{name}");` where {name} you put the name of the new route
