@@ -30,6 +30,14 @@ I will use AWS services and the AWS Javascript CDK
 5. Eventbridge for payments (if implemented)
 6. Additional AI stuff (such as bedrock and lex for a small chatbot that could be used as a waiter)
 
+# The prompts I used ⌨️
+
+For generating tables, bar seats and sunbeds: (seats.js and database)
+`Generate a JSON array for my bar that will have the following properties: Every object have the following structure: {id, number_of_seats, type, tableType(only for the tables array), comments, taken}. The id will be a unique number for the seat, type will be one of the following: bar stool, sunbed, table number_of_seats will be the number of seats you are going to have in each table/bar seat/sunbeds (bar seat must have only one seat, sunbeds must have 2), type will be square or circle, comments will be a very small description for the seat, and taken will be a boolean (set to false). Generate 10 bar seats, 4 tables and 6 duos of sunbeds. Generate just the object, no additional text.`
+
+For generating drinks: (drinks.js and database)
+`Generate a catalog for my bar in a javascript object, with the following structure: Two keys of special and drinks, where special will be the special drink of the day and drinks will be an array of additional drinks. All the drinks objects  will have this structure: {id, name, ingredients, description}. Id will be a unique id for each drink, name will be the name of the drink with an emoji at the right that describes the drink, ingredients will be the ingredients of the drink (will be a single string and not an array) and description will be a small and attractive description that will make the customer buy the drink. Generate just the object, no additional text`
+
 ## Any suggestions?
 
 If you watched this project and you want to make a suggestion, fell free to make an issue. Else, if you want to
