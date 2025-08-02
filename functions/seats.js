@@ -6,6 +6,10 @@ const setOfProblems = {
   INCORRECT_ID:
     "The id you've entered is incorrect. Please enter an existing id!",
   INCORRECT_QUERY_PARAM: "The query parameter you entered is incorrect!",
+  SEAT_IS_TAKEN: "This seat is taken by another customer. Select another seat!",
+  SEAT_IS_NOT_TAKEN: "This seat is not taken. Do you maybe want to sit in it?",
+  WRONG_ACTION:
+    "The action you performed is incorrect. You can only sit or leave!",
 };
 
 exports.handler = async (event) => {
@@ -162,6 +166,8 @@ exports.handler = async (event) => {
 
   switch (event.httpMethod) {
     case "GET":
+      // User should add either the type of the seat he wants to sit in either the id of the seat.
+      // If he doesn't, all of the seats will be returned to him.
       let queryParams = event["queryStringParameters"];
       if (queryParams) {
         if (queryParams["id"]) {
@@ -187,9 +193,36 @@ exports.handler = async (event) => {
       break;
 
     case "POST":
-      if (!event["queryStringParameters"]) {
+      // User must specify the id of the seat he wants. Then he must specify the action sit or leave
+      let params = event["queryStringParameters"];
+      if (!params || !("id" in params)) {
         body = setOfProblems.QUERY_STRING_PARAMS_ABSENT;
       }
+      let seatIndex = seats.findIndex((seat) => seat.id == params.id);
+      // If the seat is not found then the seat variable will have a negative value.
+      if (seatIndex < 0) body = setOfProblems.INCORRECT_ID;
+
+      // check the action
+      if (params["action"] == "sit") {
+        if (seats[seatIndex].taken) body = setOfProblems.SEAT_IS_TAKEN;
+        else {
+          seats[seatIndex].taken = true;
+          body = {
+            sat: "Thank you for sitting at my bar. Check our catalog in /catalog and whenever you are ready order at /order! 🍾",
+          };
+        }
+      } else if (params["action"] == "leave") {
+        if (!seats[seatIndex].taken) body = setOfProblems.SEAT_IS_NOT_TAKEN;
+        else {
+          seats[seatIndex].taken = false;
+          body = {
+            left: "Thanks for sitting in my bar! I hope to see you soon 👋",
+          };
+        }
+      } else {
+        body = setOfProblems.WRONG_ACTION;
+      }
+      break;
   }
   if (Object.values(setOfProblems).includes(body)) {
     return createResponse("400", `An error occured: ${body}`);
