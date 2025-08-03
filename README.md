@@ -36,19 +36,27 @@ For generating tables, bar seats and sunbeds: (seats.js and database)
 `Generate a JSON array for my bar that will have the following properties: Every object have the following structure: {id, number_of_seats, type, tableType(only for the tables array), comments, taken}. The id will be a unique number for the seat, type will be one of the following: bar stool, sunbed, table number_of_seats will be the number of seats you are going to have in each table/bar seat/sunbeds (bar seat must have only one seat, sunbeds must have 2), type will be square or circle, comments will be a very small description for the seat, and taken will be a boolean (set to false). Generate 10 bar seats, 4 tables and 6 duos of sunbeds. Generate just the object, no additional text.`
 
 For generating drinks: (drinks.js and database)
-`Generate a catalog for my bar in a javascript object, with the following structure: Two keys of special and drinks, where special will be the special drink of the day and drinks will be an array of additional drinks. All the drinks objects  will have this structure: {id, name, ingredients, description}. Id will be a unique id for each drink, name will be the name of the drink with an emoji at the right that describes the drink, ingredients will be the ingredients of the drink (will be a single string and not an array) and description will be a small and attractive description that will make the customer buy the drink. Generate just the object, no additional text`
+`Generate a catalog for my bar in a javascript object, with the following structure: An array of drinks objects. All the drinks objects  will have this structure: {id, name, ingredients, description, type}. Id will be a unique id for each drink, name will be the name of the drink with an emoji at the right that describes the drink, ingredients will be the ingredients of the drink (will be a single string and not an array), description will be a small and attractive description that will make the customer buy the drink and type will be the type of the drink (whiskey, cocktail, burbon) with one drink being the "special". Generate just the object, no additional text`
 
 ## Any suggestions?
 
 If you watched this project and you want to make a suggestion, fell free to make an issue. Else, if you want to
-fork it and make any changes, make sure you check these first:
+fork it and make any changes, make sure you check these instructions first:
 
-1. routesAndMethods.json
-   - Here you add in a json format the route and the methods you want to add. `{ "route": 'name', "methods": [ ...methods ] }`
-   - The value of the "route" key MUST be the name of the new route you want to create without the "/" in front of it.
-   - The value of the "methods" key MUST be an array of methods (in capital words) even if there is only one method.
-2. functions folder
-   - Here you add all of the lambda function code.
-   - Every new function must have the name of the route that supports (ex. catalog.js would be a function for the /catalog route) and must start with `exports.handler = async(event) => {return {...}}`
-3. lambda-functions.js
-   - Add to the constructor the following code below the " //IMPLEMENT " comment: `this.{name}Function = this.#createLambdaFunction("{name}");` where {name} you put the name of the new route
+- For adding a new route (of course you are adding a lambda function too)
+  1. routesAndMethods.json
+     - Here you add in a json format the route and the methods you want to add. `{ "route": 'name', "methods": [ ...methods ] }`
+     - The value of the "route" key MUST be the name of the new route you want to create without the "/" in front of it.
+     - The value of the "methods" key MUST be an array of methods (in capital words) even if there is only one method.
+  2. functions folder
+     - Here you add all of the lambda function code.
+     - Every new function must have the name of the route that supports (ex. catalog.js would be a function for the /catalog route) and must start with `exports.handler = async(event) => {return {...}}`
+  3. lambda-functions.js
+     - Add to the constructor the following code below the " //IMPLEMENT " comment: `this.{name}Function = this.#createLambdaFunction("{name}");` where {name} you put the name of the new route
+- For creating a dynamodb table and giving permissions to a lambda function to perform actions on it
+  1. dynamodb.js
+     - Here you create the table. Enter on the first lines of the class `this.{name} = this.#createTable("{name}")`, where {name} is the name of the table you want to create.
+  2. lambda-functions.js
+     - Here you select the function that you want to give permissions to perform certain actions to dynamodb.
+     - In the constructor of the class, add this line of code: this.{name}Function = this.#createLambdaFunction("{name}", {read: true/false, write: true/false}), where name is the name of the lambda function and props is an object with the permissions you want to give to the function. Don't pass anything as the second argument if you don't want to add any permissions.
+     - Make sure that the name of the function and the name of the table ARE THE SAME!

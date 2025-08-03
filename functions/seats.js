@@ -193,6 +193,8 @@ exports.handler = async (event) => {
       break;
 
     case "POST":
+      /* TODO: Add database integration */
+
       // User must specify the id of the seat he wants. Then he must specify the action sit or leave
       let params = event["queryStringParameters"];
       if (!params || !("id" in params)) {
