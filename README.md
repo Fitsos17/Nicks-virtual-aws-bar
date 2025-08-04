@@ -6,9 +6,7 @@ This api lets the customers of a bar sit to an empty table and enjoy a refreshin
 
 - The customers can enter Nicks' bar and sit at a table or at a sunbed and enjoy the beach view. They can then check the catalog and order a drink. They should get recommendations and additional information about the drinks.
 - When they order the drink, they would also pay for it (pay the price and even leave a tip if they want).
-- When the order is complete, the barmen would be notified in a screen and then they should start making the drink.
-- After the drink is ready, the waiters would be notified and then pass the drinks to the customers.
-- When the customers are ready to leave, they should leave a review if they want and then they will mark the table/sunbed as free so other customers could sit and enjoy a drink.
+- After they enjoyed the drink and they are ready to leave,they will mark the table/sunbed as free so other customers could sit and enjoy a drink.
 
 ### Other suggestions 💭
 

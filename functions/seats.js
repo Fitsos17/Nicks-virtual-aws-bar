@@ -1,3 +1,5 @@
+const { createResponse } = require("./helpers/createResponse");
+
 const setOfProblems = {
   QUERY_STRING_PARAMS_ABSENT:
     "You have not entered the id of the table you want to seat in!",
@@ -231,13 +233,3 @@ exports.handler = async (event) => {
   }
   return createResponse("200", body);
 };
-
-function createResponse(statusCode, data) {
-  return {
-    statusCode: statusCode,
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  };
-}
