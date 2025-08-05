@@ -1,6 +1,9 @@
 const { BatchWriteCommand } = require("@aws-sdk/lib-dynamodb");
-const docClient = require("../helpers/ddbClient");
-const { createResponse } = require("../helpers/createResponse");
+const docClient = require("./helpers/ddbClient");
+const { createResponse } = require("./helpers/createResponse");
+const {
+  createBatchWriteCommandInput,
+} = require("./helpers/createBatchWriteCommandInput");
 
 exports.handler = async (event) => {
   const items = [
@@ -94,19 +97,16 @@ exports.handler = async (event) => {
 
   // only 10 items will be imported, so no worries for the limit batch 25
   try {
-    const command = new BatchWriteCommand({
-      RequestItems: {
-        catalog: items.map((item) => ({
-          PutRequest: {
-            Item: item,
-          },
-        })),
-      },
-    });
+    const command = new BatchWriteCommand(
+      createBatchWriteCommandInput("catalog", items)
+    );
 
     await docClient.send(command);
     return createResponse("200", "Updated catalog succesfully!");
   } catch (error) {
-    console.error(`An error occured: ${error}`);
+    return createResponse(
+      "500",
+      "An error occured, so the update operation is stopped. Error: " + error
+    );
   }
 };

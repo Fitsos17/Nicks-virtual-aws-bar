@@ -54,7 +54,13 @@ fork it and make any changes, make sure you check these instructions first:
 - For creating a dynamodb table and giving permissions to a lambda function to perform actions on it
   1. dynamodb.js
      - Here you create the table. Enter on the first lines of the class `this.{name} = this.#createTable("{name}")`, where {name} is the name of the table you want to create.
+     - THE DOCCLIENT FOR DDB IS INSIDE THE HELPERS FOLDER!!
   2. lambda-functions.js
+     1. apigw integration and ddb permissions
      - Here you select the function that you want to give permissions to perform certain actions to dynamodb.
      - In the constructor of the class, add this line of code: this.{name}Function = this.#createLambdaFunction("{name}", {read: true/false, write: true/false}), where name is the name of the lambda function and props is an object with the permissions you want to give to the function. Don't pass anything as the second argument if you don't want to add any permissions.
-     - Make sure that the name of the function and the name of the table ARE THE SAME!
+     - Make sure that the name of the function includes the name of the table that you want to access/modify
+     2. ddb update functions
+     - These are special function that you add triggers to, so on creation they update the ddb tables for you.
+     - Add the function in functions/updateFunctions folder.
+     - Create the function inside the lambda-functions.js: `this.update{name_of_table}Table = this.#createFunctionsForIntegrationWithApiGWDynamoDB("{name_of_function}", { read: false/true, write: true/false }, false);`, where {name_of_table} is the name of the table you want to modify, {name_of_function} is the name of the function you will use to modify the table, {read, write} (true or false) are the permissions you want to add to the function and "false" is the value of the apigw integration, because update functions will only be used for updating the ddb tables and should not be accessed by api gateway.
