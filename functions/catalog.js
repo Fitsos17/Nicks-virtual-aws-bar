@@ -5,6 +5,7 @@ const {
 const { createResponse } = require("./helpers/createResponse");
 
 exports.handler = async (event) => {
+  // User types the drink id. If he doesn't, he gets all the drinks.
   const queryParameters = event["queryStringParameters"];
   if (queryParameters) {
     const idParameter = queryParameters["id"];
