@@ -1,6 +1,9 @@
 const docClient = require("./docClient");
-const { GetItemCommand, ScanCommand } = require("@aws-sdk/client-dynamodb");
-const { BatchWriteCommand } = require("@aws-sdk/lib-dynamodb");
+const {
+  BatchWriteCommand,
+  ScanCommand,
+  GetCommand,
+} = require("@aws-sdk/lib-dynamodb");
 
 exports.createBatchWriteCommand = async (tableName, items) => {
   const input = {
@@ -18,9 +21,7 @@ exports.createBatchWriteCommand = async (tableName, items) => {
 };
 
 exports.createGetItemCommand = async (tableName, id) => {
-  return { id, nid: Number(id) };
-
-  const command = new GetItemCommand({
+  const command = new GetCommand({
     TableName: tableName,
     Key: {
       id: Number(id),
@@ -30,11 +31,9 @@ exports.createGetItemCommand = async (tableName, id) => {
   return response["Item"];
 };
 
-// Bale edw ta create response. Try catch gia problhmata + implement ta alla (seats kai tetoia)
-// Psaxe pws ginetai to unmarshalling apo to response + seats
 exports.createScanCommand = async (table) => {
   const command = new ScanCommand({ TableName: table });
   const response = await docClient.send(command);
-  const items = response["Item"];
+  const items = response["Items"];
   return items;
 };
