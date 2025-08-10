@@ -1,9 +1,5 @@
-const { BatchWriteCommand } = require("@aws-sdk/lib-dynamodb");
-const docClient = require("./helpers/ddbClient");
 const { createResponse } = require("./helpers/createResponse");
-const {
-  createBatchWriteCommandInput,
-} = require("./helpers/createBatchWriteCommandInput");
+const { createBatchWriteCommand } = require("./helpers/createCommands");
 
 exports.handler = async (event) => {
   const seats = [
@@ -156,12 +152,7 @@ exports.handler = async (event) => {
   ];
 
   try {
-    const command = new BatchWriteCommand(
-      createBatchWriteCommandInput("seats", seats)
-    );
-
-    await docClient.send(command);
-
+    await createBatchWriteCommand("seats", seats);
     return createResponse("200", "Updated seats table successfully");
   } catch (error) {
     return createResponse(
