@@ -1,10 +1,10 @@
 const { createResponse } = require("./helpers/createResponse");
 
-exports.handler = async (event) => {
+exports.handler = async () => {
   const welcomeMessage = {
     welcome: "Helo everybody and welcome to nicks' bar! 🍻",
     tablesAndSunbeds:
-      "Find all of the free tables and sunbeds in the /seats route. Make sure to grab a sit and enjoy a refreshing drink! 🪑",
+      "Find all of the free tables and sunbeds in the /seats route. Grab a seat and enjoy a refreshing drink! 🪑",
     calatalog:
       "You can find the catalog with all of the drinks in the /catalog route. Find which drink you want the most and order it! 🍹",
     order:

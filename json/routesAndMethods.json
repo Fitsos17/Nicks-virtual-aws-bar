@@ -10,7 +10,7 @@
     },
     {
       "route": "seats",
-      "methods": ["GET", "POST"]
+      "methods": ["GET", "PATCH"]
     }
   ]
 }

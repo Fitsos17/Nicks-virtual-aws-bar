@@ -2,18 +2,24 @@ const { createResponse } = require("./helpers/createResponse");
 const {
   createScanCommand,
   createGetItemCommand,
+  createUpdateItemCommand,
 } = require("./helpers/createCommands");
 
-const setOfProblems = {
-  QUERY_STRING_PARAMS_ABSENT:
-    "You have not entered the id of the table you want to seat in!",
+const SET_OF_PROBLEMS = {
+  QUERY_STRING_PARAMS_ABSENT: "You have not entered the id of the table.",
+  BODY_ABSENT: "You have not entered the id of the seat or the action.",
   INCORRECT_ID:
     "The id you've entered is incorrect. Please enter an existing id!",
   INCORRECT_QUERY_PARAM: "The query parameter you entered is incorrect!",
-  SEAT_IS_TAKEN: "This seat is taken by another customer. Select another seat!",
-  SEAT_IS_NOT_TAKEN: "This seat is not taken. Do you maybe want to sit in it?",
-  WRONG_ACTION:
+  INCORRECT_ACTION:
     "The action you performed is incorrect. You can only sit or leave!",
+  INCORRECT_ACTION_OR_ID:
+    "The action you performed or the id you entered is incorrect. Please change the action or the id and try again!",
+};
+
+const ACTION_MESSAGES = {
+  SAT: "You have taken this sit. Check our catalog in /catalog and whenever you are ready order at /order! 🍾",
+  LEFT: "Thanks for sitting at my bar! I hope to see you soon 👋",
 };
 
 exports.handler = async (event) => {
@@ -28,51 +34,60 @@ exports.handler = async (event) => {
         if (seatId) {
           // User entered an id of a seat. Check if the seat exists or return an error
           const seat = await createGetItemCommand("seats", seatId);
-          body = seat ? seat : setOfProblems.INCORRECT_ID;
+          body = seat ? seat : SET_OF_PROBLEMS.INCORRECT_ID;
         } else {
           // User entered wrong query string parameter
-          body = setOfProblems.INCORRECT_QUERY_PARAM;
+          body = SET_OF_PROBLEMS.INCORRECT_QUERY_PARAM;
         }
       } else {
         body = await createScanCommand("seats");
       }
       break;
 
-    case "POST":
-      /* TODO: Add database integration */
-
+    case "PATCH":
       // User must specify the id of the seat he wants. Then he must specify the action sit or leave
-      let params = event["queryStringParameters"];
-      if (!params || !("id" in params)) {
-        body = setOfProblems.QUERY_STRING_PARAMS_ABSENT;
-      }
-      let seatIndex = seats.findIndex((seat) => seat.id == params.id);
-      // If the seat is not found then the seat variable will have a negative value.
-      if (seatIndex < 0) body = setOfProblems.INCORRECT_ID;
-
-      // check the action
-      if (params["action"] == "sit") {
-        if (seats[seatIndex].taken) body = setOfProblems.SEAT_IS_TAKEN;
-        else {
-          seats[seatIndex].taken = true;
-          body = {
-            sat: "Thank you for sitting at my bar. Check our catalog in /catalog and whenever you are ready order at /order! 🍾",
-          };
-        }
-      } else if (params["action"] == "leave") {
-        if (!seats[seatIndex].taken) body = setOfProblems.SEAT_IS_NOT_TAKEN;
-        else {
-          seats[seatIndex].taken = false;
-          body = {
-            left: "Thanks for sitting in my bar! I hope to see you soon 👋",
-          };
-        }
+      let params = event["body"];
+      if (!params) {
+        body = SET_OF_PROBLEMS.BODY_ABSENT;
       } else {
-        body = setOfProblems.WRONG_ACTION;
+        let paramsKeys = Object.keys(params);
+        if (
+          paramsKeys.length === 0 ||
+          !paramsKeys.includes("id") ||
+          !paramsKeys.includes("action")
+        ) {
+          body = SET_OF_PROBLEMS.QUERY_STRING_PARAMS_ABSENT;
+        } else if (params["action"] !== "sit" && params["action"] !== "leave") {
+          body = SET_OF_PROBLEMS.INCORRECT_ACTION;
+        } else {
+          // If action is sit, then sit is true. If action is leave, then sit is false.
+          // Action is surely either sit or leave
+          const sit = params["action"] === "sit";
+
+          // if the action is sit, we want the seat to be taken after the request and
+          // if the action is leave, we want the seat to not be taken after the request.
+          const taken = sit ? true : false;
+          const change = await createUpdateItemCommand(
+            "seats",
+            params["id"],
+            "taken",
+            taken
+          );
+
+          if (change === "PROBLEM") {
+            body = SET_OF_PROBLEMS.INCORRECT_ACTION_OR_ID;
+          } else {
+            body = sit ? ACTION_MESSAGES.SAT : ACTION_MESSAGES.LEFT;
+          }
+        }
       }
+
+      break;
+    default:
+      body = "Invalid method!";
       break;
   }
-  if (Object.values(setOfProblems).includes(body)) {
+  if (Object.values(SET_OF_PROBLEMS).includes(body)) {
     return createResponse("400", `An error occured: ${body}`);
   }
   return createResponse("200", body);
