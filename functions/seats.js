@@ -7,6 +7,8 @@ const {
 
 const SET_OF_PROBLEMS = {
   QUERY_STRING_PARAMS_ABSENT: "You have not entered the id of the table.",
+  BODY_PARAMS_INCORRECT:
+    "Please enter the id of the seat and the action you want to perform!",
   BODY_ABSENT: "You have not entered the id of the seat or the action.",
   INCORRECT_ID:
     "The id you've entered is incorrect. Please enter an existing id!",
@@ -14,7 +16,7 @@ const SET_OF_PROBLEMS = {
   INCORRECT_ACTION:
     "The action you performed is incorrect. You can only sit or leave!",
   INCORRECT_ACTION_OR_ID:
-    "The action you performed or the id you entered is incorrect. Please change the action or the id and try again!",
+    "The id you entered is incorrect or someone just took/left this seat. Please enter a different action/id!",
 };
 
 const ACTION_MESSAGES = {
@@ -46,30 +48,33 @@ exports.handler = async (event) => {
 
     case "PATCH":
       // User must specify the id of the seat he wants. Then he must specify the action sit or leave
-      let params = event["body"];
-      if (!params) {
+      let eventBody = event["body"] ? JSON.parse(event["body"]) : "";
+      if (!eventBody) {
         body = SET_OF_PROBLEMS.BODY_ABSENT;
       } else {
-        let paramsKeys = Object.keys(params);
+        let paramsKeys = Object.keys(eventBody);
         if (
           paramsKeys.length === 0 ||
           !paramsKeys.includes("id") ||
           !paramsKeys.includes("action")
         ) {
-          body = SET_OF_PROBLEMS.QUERY_STRING_PARAMS_ABSENT;
-        } else if (params["action"] !== "sit" && params["action"] !== "leave") {
+          body = SET_OF_PROBLEMS.BODY_PARAMS_INCORRECT;
+        } else if (
+          eventBody["action"] !== "sit" &&
+          eventBody["action"] !== "leave"
+        ) {
           body = SET_OF_PROBLEMS.INCORRECT_ACTION;
         } else {
           // If action is sit, then sit is true. If action is leave, then sit is false.
           // Action is surely either sit or leave
-          const sit = params["action"] === "sit";
+          const sit = eventBody["action"] === "sit";
 
           // if the action is sit, we want the seat to be taken after the request and
           // if the action is leave, we want the seat to not be taken after the request.
           const taken = sit ? true : false;
           const change = await createUpdateItemCommand(
             "seats",
-            params["id"],
+            eventBody["id"],
             "taken",
             taken
           );
