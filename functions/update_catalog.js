@@ -1,5 +1,7 @@
 const { createBatchWriteCommand } = require("./helpers/createCommands");
-const { createResponse } = require("./helpers/createResponse");
+const {
+  handleReturningOfUpdateFunctions,
+} = require("./helpers/handleErrorsAndReturning");
 
 exports.handler = async (event) => {
   const items = [
@@ -94,11 +96,8 @@ exports.handler = async (event) => {
   // only 10 items will be imported, so no worries for the limit batch 25
   try {
     await createBatchWriteCommand("Catalog", items);
-    return createResponse("200", "Updated Catalog succesfully!");
+    return handleReturningOfUpdateFunctions(200, "Catalog");
   } catch (error) {
-    return createResponse(
-      "500",
-      "An error occured, so the update operation is stopped. Error: " + error
-    );
+    return handleReturningOfUpdateFunctions(500, "Catalog", error);
   }
 };

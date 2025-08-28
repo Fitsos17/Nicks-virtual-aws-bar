@@ -1,23 +1,13 @@
-const { createResponse } = require("./helpers/createResponse");
+const {
+  SET_OF_PROBLEMS,
+  handleReturningOfRouteFunctions,
+} = require("./helpers/handleErrorsAndReturning");
+
 const {
   createScanCommand,
   createGetItemCommand,
   createUpdateItemCommand,
 } = require("./helpers/createCommands");
-
-const SET_OF_PROBLEMS = {
-  QUERY_STRING_PARAMS_ABSENT: "You have not entered the id of the table.",
-  BODY_PARAMS_INCORRECT:
-    "Please enter the id of the seat and the action you want to perform!",
-  BODY_ABSENT: "You have not entered the id of the seat or the action.",
-  INCORRECT_ID:
-    "The id you've entered is incorrect. Please enter an existing id!",
-  INCORRECT_QUERY_PARAM: "The query parameter you entered is incorrect!",
-  INCORRECT_ACTION:
-    "The action you performed is incorrect. You can only sit or leave!",
-  INCORRECT_ACTION_OR_ID:
-    "The id you entered is incorrect or someone just took/left this seat. Please enter a different action/id!",
-};
 
 const ACTION_MESSAGES = {
   SAT: {
@@ -91,11 +81,9 @@ exports.handler = async (event) => {
 
       break;
     default:
-      body = "Invalid method!";
+      body = SET_OF_PROBLEMS.INVALID_METHOD;
       break;
   }
-  if (Object.values(SET_OF_PROBLEMS).includes(body)) {
-    return createResponse("400", { err: `An error occured: ${body}` });
-  }
-  return createResponse("200", body);
+
+  return handleReturningOfRouteFunctions(body);
 };

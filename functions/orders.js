@@ -1,5 +1,21 @@
-const { createResponse } = require("./helpers/createResponse");
+const {
+  SET_OF_PROBLEMS,
+  handleReturningOfRouteFunctions,
+} = require("./helpers/handleErrorsAndReturning");
 
 exports.handler = async (event) => {
-  return createResponse(200, "Order page");
+  let body;
+
+  switch (event.httpMethod) {
+    case "GET":
+      let params = event["queryStringParameters"];
+      if (!params) body = SET_OF_PROBLEMS.QUERY_STRING_PARAMS_ABSENT;
+      else {
+      }
+      break;
+    default:
+      break;
+  }
+
+  return handleReturningOfRouteFunctions(body);
 };

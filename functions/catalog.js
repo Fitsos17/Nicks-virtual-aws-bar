@@ -2,27 +2,26 @@ const {
   createGetItemCommand,
   createScanCommand,
 } = require("./helpers/createCommands");
-const { createResponse } = require("./helpers/createResponse");
+const {
+  SET_OF_PROBLEMS,
+  handleReturningOfRouteFunctions,
+} = require("./helpers/handleErrorsAndReturning");
 
 exports.handler = async (event) => {
+  let body;
   // User types the drink id. If he doesn't, he gets all the drinks.
   const queryParameters = event["queryStringParameters"];
   if (queryParameters) {
     const idParameter = queryParameters["id"];
     if (!idParameter) {
-      return createResponse("400", {
-        err: "You have to pass the id query string parameter.",
-      });
+      body = SET_OF_PROBLEMS.QUERY_STRING_PARAMS_ABSENT;
     }
     const drink = await createGetItemCommand("Catalog", idParameter);
 
-    return drink
-      ? createResponse("200", drink)
-      : createResponse("400", {
-          err: `Drink with id: ${idParameter} not found. Enter a different id and try again!`,
-        });
+    body = drink ? drink : SET_OF_PROBLEMS.DRINK_NOT_FOUND;
+  } else {
+    body = await createScanCommand("Catalog");
   }
 
-  const items = await createScanCommand("Catalog");
-  return createResponse("200", items);
+  return handleReturningOfRouteFunctions(body);
 };

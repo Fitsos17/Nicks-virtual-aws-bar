@@ -1,4 +1,6 @@
-const { createResponse } = require("./helpers/createResponse");
+const {
+  handleReturningOfUpdateFunctions,
+} = require("./helpers/handleErrorsAndReturning");
 const { createBatchWriteCommand } = require("./helpers/createCommands");
 
 exports.handler = async (event) => {
@@ -153,11 +155,8 @@ exports.handler = async (event) => {
 
   try {
     await createBatchWriteCommand("Seats", seats);
-    return createResponse("200", "Updated Seats table successfully");
+    return handleReturningOfUpdateFunctions(200, "Seats");
   } catch (error) {
-    return createResponse(
-      "500",
-      "An error occured, so the update operation is stopped. Error: " + error
-    );
+    return handleReturningOfUpdateFunctions(500, "Seats", error);
   }
 };
