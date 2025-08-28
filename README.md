@@ -35,35 +35,3 @@ For generating tables, bar seats and sunbeds: (seats.js and database)
 
 For generating drinks: (catalog.js and database)
 `Generate a catalog for my bar in a javascript object, with the following structure: An array of drinks objects. All the drinks objects  will have this structure: {id, name, ingredients, description, type}. id will be a unique id for each drink, name will be the name of the drink with an emoji at the right that describes the drink, ingredients will be the ingredients of the drink (will be a single string and not an array), description will be a small and attractive description that will make the customer buy the drink and type will be the type of the drink (whiskey, cocktail, burbon) with one drink being the "special". Generate just the object, no additional text`
-<<<<<<< HEAD
-
-## Any suggestions?
-
-If you watched this project and you want to make a suggestion, fell free to make an issue. Else, if you want to
-fork it and make any changes, make sure you check these instructions first:
-
-- For adding a new route (of course you are adding a lambda function too)
-  1. routesAndMethods.json
-     - Here you add in a json format the route and the methods you want to add. `{ "route": 'name', "methods": [ ...methods ] }`
-     - The value of the "route" key MUST be the name of the new route you want to create without the "/" in front of it.
-     - The value of the "methods" key MUST be an array of methods (in capital words) even if there is only one method.
-  2. functions folder
-     - Here you add all of the lambda function code.
-     - Every new function must have the name of the route that supports (ex. catalog.js would be a function for the /catalog route) and must start with `exports.handler = async(event) => {return {...}}`
-  3. lambda-functions.js
-     - Add to the constructor the following code below the " //IMPLEMENT " comment: `this.{name}Function = this.#createLambdaFunction("{name}");` where {name} you put the name of the new route
-- For creating a dynamodb table and giving permissions to a lambda function to perform actions on it
-  1. dynamodb.js
-     - Here you create the table. Enter on the first lines of the class `this.{name} = this.#createTable("{name}")`, where {name} is the name of the table you want to create.
-     - THE DOCCLIENT FOR DDB IS INSIDE THE HELPERS FOLDER!!
-  2. lambda-functions.js
-     1. apigw integration and ddb permissions
-     - Here you select the function that you want to give permissions to perform certain actions to dynamodb.
-     - In the constructor of the class, add this line of code: this.{name}Function = this.#createLambdaFunction("{name}", {read: true/false, write: true/false}), where name is the name of the lambda function and props is an object with the permissions you want to give to the function. Don't pass anything as the second argument if you don't want to add any permissions.
-     - Make sure that the name of the function includes the name of the table that you want to access/modify
-     2. ddb update functions
-     - These are special function that you add triggers to, so on creation they update the ddb tables for you.
-     - Add the function in functions/updateFunctions folder.
-     - Create the function inside the lambda-functions.js: `this.update{name_of_table}Table = this.#createFunctionsForIntegrationWithApiGWDynamoDB("{name_of_function}", { read: false/true, write: true/false }, false);`, where {name_of_table} is the name of the table you want to modify, {name_of_function} is the name of the function you will use to modify the table, {read, write} (true or false) are the permissions you want to add to the function and "false" is the value of the apigw integration, because update functions will only be used for updating the ddb tables and should not be accessed by api gateway.
-=======
->>>>>>> 82dd3bc (Changed table to function mapping functionallity, changed README and added err object)

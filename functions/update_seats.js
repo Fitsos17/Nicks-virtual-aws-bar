@@ -152,13 +152,8 @@ exports.handler = async (event) => {
   ];
 
   try {
-<<<<<<< HEAD
-    await createBatchWriteCommand("seats", seats);
-    return createResponse("200", "Updated seats table successfully");
-=======
     await createBatchWriteCommand("Seats", seats);
     return createResponse("200", "Updated Seats table successfully");
->>>>>>> 82dd3bc (Changed table to function mapping functionallity, changed README and added err object)
   } catch (error) {
     return createResponse(
       "500",

@@ -20,15 +20,10 @@ const SET_OF_PROBLEMS = {
 };
 
 const ACTION_MESSAGES = {
-<<<<<<< HEAD
-  SAT: "You have taken this sit. Check our catalog in /catalog and whenever you are ready order at /order! 🍾",
-  LEFT: "Thanks for sitting at my bar! I hope to see you soon 👋",
-=======
   SAT: {
     sat: "You have taken this sit. Check our catalog in /catalog and whenever you are ready order at /order! 🍾",
   },
   LEFT: { left: "Thanks for sitting at my bar! I hope to see you soon 👋" },
->>>>>>> 82dd3bc (Changed table to function mapping functionallity, changed README and added err object)
 };
 
 exports.handler = async (event) => {
@@ -42,22 +37,14 @@ exports.handler = async (event) => {
         const seatId = queryParams["id"];
         if (seatId) {
           // User entered an id of a seat. Check if the seat exists or return an error
-<<<<<<< HEAD
-          const seat = await createGetItemCommand("seats", seatId);
-=======
           const seat = await createGetItemCommand("Seats", seatId);
->>>>>>> 82dd3bc (Changed table to function mapping functionallity, changed README and added err object)
           body = seat ? seat : SET_OF_PROBLEMS.INCORRECT_ID;
         } else {
           // User entered wrong query string parameter
           body = SET_OF_PROBLEMS.INCORRECT_QUERY_PARAM;
         }
       } else {
-<<<<<<< HEAD
-        body = await createScanCommand("seats");
-=======
         body = await createScanCommand("Seats");
->>>>>>> 82dd3bc (Changed table to function mapping functionallity, changed README and added err object)
       }
       break;
 
@@ -88,11 +75,7 @@ exports.handler = async (event) => {
           // if the action is leave, we want the seat to not be taken after the request.
           const taken = sit ? true : false;
           const change = await createUpdateItemCommand(
-<<<<<<< HEAD
-            "seats",
-=======
             "Seats",
->>>>>>> 82dd3bc (Changed table to function mapping functionallity, changed README and added err object)
             eventBody["id"],
             "taken",
             taken
@@ -112,11 +95,7 @@ exports.handler = async (event) => {
       break;
   }
   if (Object.values(SET_OF_PROBLEMS).includes(body)) {
-<<<<<<< HEAD
-    return createResponse("400", `An error occured: ${body}`);
-=======
     return createResponse("400", { err: `An error occured: ${body}` });
->>>>>>> 82dd3bc (Changed table to function mapping functionallity, changed README and added err object)
   }
   return createResponse("200", body);
 };
