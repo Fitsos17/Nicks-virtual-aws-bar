@@ -35,6 +35,7 @@ For generating tables, bar seats and sunbeds: (seats.js and database)
 
 For generating drinks: (catalog.js and database)
 `Generate a catalog for my bar in a javascript object, with the following structure: An array of drinks objects. All the drinks objects  will have this structure: {id, name, ingredients, description, type}. id will be a unique id for each drink, name will be the name of the drink with an emoji at the right that describes the drink, ingredients will be the ingredients of the drink (will be a single string and not an array), description will be a small and attractive description that will make the customer buy the drink and type will be the type of the drink (whiskey, cocktail, burbon) with one drink being the "special". Generate just the object, no additional text`
+<<<<<<< HEAD
 
 ## Any suggestions?
 
@@ -64,3 +65,5 @@ fork it and make any changes, make sure you check these instructions first:
      - These are special function that you add triggers to, so on creation they update the ddb tables for you.
      - Add the function in functions/updateFunctions folder.
      - Create the function inside the lambda-functions.js: `this.update{name_of_table}Table = this.#createFunctionsForIntegrationWithApiGWDynamoDB("{name_of_function}", { read: false/true, write: true/false }, false);`, where {name_of_table} is the name of the table you want to modify, {name_of_function} is the name of the function you will use to modify the table, {read, write} (true or false) are the permissions you want to add to the function and "false" is the value of the apigw integration, because update functions will only be used for updating the ddb tables and should not be accessed by api gateway.
+=======
+>>>>>>> 82dd3bc (Changed table to function mapping functionallity, changed README and added err object)

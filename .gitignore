@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 node_modules
 
 # CDK asset staging directory
@@ -7,3 +8,11 @@ cdk.out
 IDEAS.md
 ROUTES_TO_DEVELOP.md
 DUMMY_EVENT.json
+=======
+node_modules/
+dist/
+.env
+.DS_Store
+*.log
+cdk.out/
+>>>>>>> 82dd3bc (Changed table to function mapping functionallity, changed README and added err object)

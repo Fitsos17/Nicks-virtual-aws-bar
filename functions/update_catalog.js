@@ -93,8 +93,13 @@ exports.handler = async (event) => {
 
   // only 10 items will be imported, so no worries for the limit batch 25
   try {
+<<<<<<< HEAD
     await createBatchWriteCommand("catalog", items);
     return createResponse("200", "Updated catalog succesfully!");
+=======
+    await createBatchWriteCommand("Catalog", items);
+    return createResponse("200", "Updated Catalog succesfully!");
+>>>>>>> 82dd3bc (Changed table to function mapping functionallity, changed README and added err object)
   } catch (error) {
     return createResponse(
       "500",
