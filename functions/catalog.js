@@ -15,10 +15,11 @@ exports.handler = async (event) => {
     const idParameter = queryParameters["id"];
     if (!idParameter) {
       body = SET_OF_PROBLEMS.QUERY_STRING_PARAMS_ABSENT;
-    }
-    const drink = await createGetItemCommand("Catalog", idParameter);
+    } else {
+      const drink = await createGetItemCommand("Catalog", idParameter);
 
-    body = drink ? drink : SET_OF_PROBLEMS.DRINK_NOT_FOUND;
+      body = drink ? drink : SET_OF_PROBLEMS.DRINK_NOT_FOUND;
+    }
   } else {
     body = await createScanCommand("Catalog");
   }
