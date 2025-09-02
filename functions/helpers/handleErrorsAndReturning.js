@@ -10,26 +10,59 @@ const createResponse = (statusCode, data) => {
 
 const SET_OF_ERRORS = {
   // general errors
-  QUERY_STRING_PARAMS_ABSENT: "You have not entered the id.",
-  BODY_ABSENT: "You have not entered a body.",
-  INVALID_METHOD: "Invalid method!",
-  INCORRECT_ID:
-    "The id you've entered is incorrect. Please enter an existing id!",
-  INCORRECT_QUERY_PARAM: "The query parameters you entered is incorrect!",
+  QUERY_STRING_PARAMS_ABSENT: {
+    code: "QUERY_PARAMETERS_ABSENT",
+    errorMessage: "You have not entered the id.",
+  },
+  BODY_ABSENT: {
+    code: "BODY_ABSENT",
+    errorMessage: "You have not entered a body.",
+  },
+  INVALID_METHOD: {
+    code: "INVALID_METHOD",
+    errorMessage: "Invalid method!",
+  },
+  INCORRECT_ID: {
+    code: "INCORRECT_ID",
+    errorMessage:
+      "The id you've entered is incorrect. Please enter an existing id!",
+  },
+  INCORRECT_QUERY_PARAM: {
+    code: "INCORRECT_QUERY_PARAM",
+    errorMessage: "The query parameters you entered is incorrect!",
+  },
 
   // seats
-  SEAT_BODY_PARAMS_INCORRECT:
-    "Please enter the id of the seat and the action you want to perform!",
-  SEAT_BODY_ABSENT:
-    "You have not entered the id of the seat or the action you want to perform.",
-  INCORRECT_ACTION_OR_ID:
-    "The id you entered is incorrect or someone just took/left this seat. Please enter a different action/id!",
-  INCORRECT_ACTION:
-    "The action you performed is incorrect. You can only sit or leave!",
+  SEAT_BODY_PARAMS_INCORRECT: {
+    code: "SEAT_BODY_PARAMS_INCORRECT",
+    errorMessage:
+      "Please enter the id of the seat and the action you want to perform!",
+  },
+
+  SEAT_BODY_ABSENT: {
+    code: "SEAT_BODY_ABSENT",
+    errorMessage:
+      "You have not entered the id of the seat or the action you want to perform.",
+  },
+
+  INCORRECT_ACTION_OR_ID: {
+    code: "INCORRECT_ACTION_OR_ID",
+    errorMessage:
+      "The id you entered is incorrect or someone just took/left this seat. Please enter a different action/id!",
+  },
+
+  INCORRECT_ACTION: {
+    code: "INCORRECT_ACTION",
+    errorMessage:
+      "The action you performed is incorrect. You can only sit or leave!",
+  },
 
   // orders
-  ORDERS_INCORRECT_BODY:
-    "The body you have entered is incorrect. You must enter the seatId and the drinks array, including the id of each drink and the quantity.",
+  ORDERS_INCORRECT_BODY: {
+    code: "ORDERS_INCORRECT_BODY",
+    errorMessage:
+      "The body you have entered is incorrect. You must enter the seatId and the drinks you want to order, including the id and the quantity of each drink.",
+  },
 };
 
 const handleReturningOfRouteFunctions = (body) => {
