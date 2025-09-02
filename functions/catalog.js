@@ -3,22 +3,22 @@ const {
   createScanCommand,
 } = require("./helpers/createCommands");
 const {
-  SET_OF_PROBLEMS,
+  SET_OF_ERRORS,
   handleReturningOfRouteFunctions,
 } = require("./helpers/handleErrorsAndReturning");
 
 exports.handler = async (event) => {
   let body;
-  // User types the drink id. If he doesn't, he gets all the drinks.
+  // User types the id of the drink. If he doesn't, he gets all the drinks.
   const queryParameters = event["queryStringParameters"];
-  if (queryParameters) {
+  if (!queryParameters) {
     const idParameter = queryParameters["id"];
     if (!idParameter) {
-      body = SET_OF_PROBLEMS.QUERY_STRING_PARAMS_ABSENT;
+      body = SET_OF_ERRORS.INCORRECT_QUERY_PARAM;
     } else {
       const drink = await createGetItemCommand("Catalog", idParameter);
 
-      body = drink ? drink : SET_OF_PROBLEMS.DRINK_NOT_FOUND;
+      body = drink ? drink : SET_OF_ERRORS.INCORRECT_ID;
     }
   } else {
     body = await createScanCommand("Catalog");

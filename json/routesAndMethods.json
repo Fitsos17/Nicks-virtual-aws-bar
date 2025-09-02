@@ -12,6 +12,9 @@
       "route": "seats",
       "methods": ["GET", "PATCH"]
     },
-    { "route": "orders", "methods": ["GET", "POST"] }
+    {
+      "route": "orders",
+      "methods": ["GET", "POST"]
+    }
   ]
 }
