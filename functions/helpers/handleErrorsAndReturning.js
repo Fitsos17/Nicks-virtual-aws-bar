@@ -10,18 +10,6 @@ const createResponse = (statusCode, data) => {
 
 const SET_OF_ERRORS = {
   // general errors
-  QUERY_STRING_PARAMS_ABSENT: {
-    code: "QUERY_PARAMETERS_ABSENT",
-    errorMessage: "You have not entered the id.",
-  },
-  BODY_ABSENT: {
-    code: "BODY_ABSENT",
-    errorMessage: "You have not entered a body.",
-  },
-  INVALID_METHOD: {
-    code: "INVALID_METHOD",
-    errorMessage: "Invalid method!",
-  },
   INCORRECT_ID: {
     code: "INCORRECT_ID",
     errorMessage:
@@ -45,16 +33,16 @@ const SET_OF_ERRORS = {
       "You have not entered the id of the seat or the action you want to perform.",
   },
 
-  INCORRECT_ACTION_OR_ID: {
-    code: "INCORRECT_ACTION_OR_ID",
-    errorMessage:
-      "The id you entered is incorrect or someone just took/left this seat. Please enter a different action/id!",
-  },
-
-  INCORRECT_ACTION: {
-    code: "INCORRECT_ACTION",
+  SEAT_INCORRECT_ACTION: {
+    code: "SEAT_INCORRECT_ACTION",
     errorMessage:
       "The action you performed is incorrect. You can only sit or leave!",
+  },
+  // for seats ddb response
+  SEAT_INCORRECT_ACTION_OR_ID: {
+    code: "SEAT_INCORRECT_ACTION_OR_ID",
+    errorMessage:
+      "The id you entered is incorrect or someone just took/left this seat. Please enter a different action/id!",
   },
 
   // orders
@@ -63,13 +51,22 @@ const SET_OF_ERRORS = {
     errorMessage:
       "The body you have entered is incorrect. You must enter the seatId and the drinks you want to order, including the id and the quantity of each drink.",
   },
+  ORDER_SEAT_ID_INORRECT: {
+    code: "ORDER_SEAT_ID_INORRECT",
+    errorMessage:
+      "The seatId you entered does not exist. Enter a different one and try again!",
+  },
+  ORDER_SEAT_NOT_TAKEN: {
+    code: "ORDER_SEAT_NOT_TAKEN",
+    errorMessage: "To order from a specific table, you firstly must sit in it!",
+  },
 };
 
 const handleReturningOfRouteFunctions = (body) => {
   // Check if the body includes any of the errors. If so,
   // we need to return an error.
   if (Object.values(SET_OF_ERRORS).includes(body)) {
-    return createResponse(400, { err: body });
+    return createResponse(400, { error: body });
   }
   return createResponse(200, body);
 };

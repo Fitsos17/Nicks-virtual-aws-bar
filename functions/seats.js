@@ -44,7 +44,7 @@ exports.handler = async (event) => {
       // User must specify the id of the seat he wants. Then he must specify the action sit or leave
       let eventBody = event["body"] ? JSON.parse(event["body"]) : "";
       if (!eventBody) {
-        body = SET_OF_ERRORS.BODY_ABSENT;
+        body = SET_OF_ERRORS.SEAT_BODY_ABSENT;
         break;
       }
       let paramsKeys = Object.keys(eventBody);
@@ -58,7 +58,7 @@ exports.handler = async (event) => {
         eventBody["action"].toLowerCase() !== "sit" &&
         eventBody["action"].toLowerCase() !== "leave"
       ) {
-        body = SET_OF_ERRORS.INCORRECT_ACTION;
+        body = SET_OF_ERRORS.SEAT_INCORRECT_ACTION;
       } else {
         // If action is sit, then value of sit varibable will be true. If action is leave,
         // then sit is false. Action is surely either sit or leave (it is checked aboved)
@@ -75,15 +75,12 @@ exports.handler = async (event) => {
         );
 
         if (change === "PROBLEM") {
-          body = SET_OF_ERRORS.INCORRECT_ACTION_OR_ID;
+          body = SET_OF_ERRORS.SEAT_INCORRECT_ACTION_OR_ID;
           break;
         }
         body = sit ? ACTION_MESSAGES.SAT : ACTION_MESSAGES.LEFT;
       }
 
-      break;
-    default:
-      body = SET_OF_ERRORS.INVALID_METHOD;
       break;
   }
 
