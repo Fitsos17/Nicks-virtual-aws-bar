@@ -48,18 +48,40 @@ exports.createBatchGetCommand = async (tableName, ids, attributesToGet) => {
   }
 };
 
-exports.createGetItemCommand = async (tableName, id) => {
+exports.createGetItemCommand = async (
+  tableName,
+  id,
+  projectionExpression = []
+) => {
   try {
-    const command = new GetCommand({
+    const params = {
       TableName: tableName,
       Key: {
         id: Number(id),
       },
-    });
-    const response = await docClient.send(command);
+    };
+
+    // here we check if we want specific values from the objects
+    if (
+      typeof projectionExpression === "object" &&
+      projectionExpression.length !== 0
+    ) {
+      // convert to the form -> "id, name, "
+      params["ProjectionExpression"] = projectionExpression
+        .map((val) => `#${val}`)
+        .join(", ");
+      params["ExpressionAttributeNames"] = projectionExpression.reduce(
+        (acc, val) => {
+          acc[`#${val}`] = val;
+          return acc;
+        },
+        {}
+      );
+    }
+    const response = await docClient.send(new GetCommand(params));
     return response["Item"];
   } catch (error) {
-    throw new Error(error.message);
+    throw new Error(error);
   }
 };
 

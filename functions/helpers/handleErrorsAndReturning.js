@@ -62,6 +62,7 @@ const ERROR_CONSTANTS = {
   },
 };
 
+// used for handling bad orders
 const createErrorFunctions = {
   // for invalid drink structure and quantity 0
   invalidDrinkStructure: (drinkObject, missingKey) => ({
@@ -75,6 +76,12 @@ const createErrorFunctions = {
     code: "INVALID_QUANTITY",
     errorMessage: `The drink object that has drinkId: ${drinkObject["drinkId"]} has invalid quantity. Quantity must be > 0 and an integer.`,
     quantityEntered: drinkObject["quantity"],
+  }),
+  invalidOrderId: (drinkId) => ({
+    code: "INVALID_DRINK_ID",
+    errorMessage:
+      "The following drinkId does not correspond to any drink from the catalog. Please enter a different id and try again!",
+    drinkId: drinkId,
   }),
 };
 
