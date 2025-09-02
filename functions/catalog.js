@@ -3,7 +3,7 @@ const {
   createScanCommand,
 } = require("./helpers/createCommands");
 const {
-  SET_OF_ERRORS,
+  ERROR_CONSTANTS,
   handleReturningOfRouteFunctions,
 } = require("./helpers/handleErrorsAndReturning");
 
@@ -17,11 +17,11 @@ exports.handler = async (event) => {
   } else {
     const idParameter = queryParameters["id"];
     if (!idParameter) {
-      body = SET_OF_ERRORS.INCORRECT_QUERY_PARAM;
+      body = ERROR_CONSTANTS.INCORRECT_QUERY_PARAM;
     } else {
       const drink = await createGetItemCommand("Catalog", idParameter);
 
-      body = drink ? drink : SET_OF_ERRORS.INCORRECT_ID;
+      body = drink ? drink : ERROR_CONSTANTS.INCORRECT_ID;
     }
   }
 

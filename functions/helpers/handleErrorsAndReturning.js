@@ -8,7 +8,7 @@ const createResponse = (statusCode, data) => {
   };
 };
 
-const SET_OF_ERRORS = {
+const ERROR_CONSTANTS = {
   // general errors
   INCORRECT_ID: {
     code: "INCORRECT_ID",
@@ -62,10 +62,26 @@ const SET_OF_ERRORS = {
   },
 };
 
+const createErrorFunctions = {
+  // for invalid drink structure and quantity 0
+  invalidDrinkStructure: (drinkObject, missingKey) => ({
+    code: "INVALID_DRINK_STRUCTURE",
+    errorMessage:
+      "One of the objects you entered has incorrect structure. All of the objects must have a valid drinkId and a quantity > 0.",
+    drinkObject: drinkObject,
+    missingKey: missingKey,
+  }),
+  invalidQuantity: (drinkObject) => ({
+    code: "INVALID_QUANTITY",
+    errorMessage: `The drink object that has drinkId: ${drinkObject["drinkId"]} has invalid quantity. Quantity must be > 0 and an integer.`,
+    quantityEntered: drinkObject["quantity"],
+  }),
+};
+
 const handleReturningOfRouteFunctions = (body) => {
-  // Check if the body includes any of the errors. If so,
-  // we need to return an error.
-  if (Object.values(SET_OF_ERRORS).includes(body)) {
+  // Check if the body includes an error message key.
+  // If so, return an error
+  if (Object.keys(body).includes("errorMessage")) {
     return createResponse(400, { error: body });
   }
   return createResponse(200, body);
@@ -85,7 +101,8 @@ const handleReturningOfUpdateFunctions = (tableName, statusCode, error) => {
 };
 
 module.exports = {
-  SET_OF_ERRORS,
+  ERROR_CONSTANTS,
   handleReturningOfRouteFunctions,
   handleReturningOfUpdateFunctions,
+  createErrorFunctions,
 };

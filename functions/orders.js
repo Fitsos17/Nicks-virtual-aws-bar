@@ -1,7 +1,8 @@
 const { createGetItemCommand } = require("./helpers/createCommands");
 const {
   handleReturningOfRouteFunctions,
-  SET_OF_ERRORS,
+  ERROR_CONSTANTS,
+  createErrorFunctions,
 } = require("./helpers/handleErrorsAndReturning");
 
 exports.handler = async (event) => {
@@ -29,19 +30,36 @@ exports.handler = async (event) => {
     }
   */
 
+  const checkInvalidDrinksStructure = (drinksArray) => {
+    for (let drink of drinksArray) {
+      const keys = Object.keys(drink);
+      if (!keys.includes("drinkId")) {
+        return createErrorFunctions.invalidDrinkStructure(drink, "drinkId");
+      } else if (!keys.includes("quantity")) {
+        return createErrorFunctions.invalidDrinkStructure(drink, "quantity");
+      } else if (
+        Number(drink["quantity"]) <= 0 ||
+        Number(drink["quantity"]) % 1 !== 0
+      ) {
+        return createErrorFunctions.invalidQuantity(drink);
+      }
+    }
+    return "";
+  };
+
   switch (event.httpMethod) {
     case "POST":
       let eventBody = event["body"] ? JSON.parse(event["body"]) : "";
       // check for bad input
       if (!eventBody) {
-        body = SET_OF_ERRORS.ORDERS_INCORRECT_BODY;
+        body = ERROR_CONSTANTS.ORDERS_INCORRECT_BODY;
         break;
       } else if (
         !Object.keys(eventBody).includes("seatId") ||
         !Object.keys(eventBody).includes("drinks") ||
         eventBody["drinks"].length === 0
       ) {
-        body = SET_OF_ERRORS.ORDERS_INCORRECT_BODY;
+        body = ERROR_CONSTANTS.ORDERS_INCORRECT_BODY;
         break;
       }
 
@@ -49,13 +67,26 @@ exports.handler = async (event) => {
       const seatId = Number(eventBody["seatId"]);
       const foundSeat = await createGetItemCommand("Seats", seatId);
       if (!foundSeat) {
-        body = SET_OF_ERRORS.ORDER_SEAT_ID_INORRECT;
+        body = ERROR_CONSTANTS.ORDER_SEAT_ID_INORRECT;
         break;
       } else if (!foundSeat.taken) {
-        body = SET_OF_ERRORS.ORDER_SEAT_NOT_TAKEN;
+        body = ERROR_CONSTANTS.ORDER_SEAT_NOT_TAKEN;
         break;
       }
-      body = foundSeat;
+
+      // check drinks structure if is of type [ { drinkId, quantity } ]
+      const drinks = eventBody["drinks"];
+      const invalidDrinkStucture = checkInvalidDrinksStructure(drinks);
+      if (invalidDrinkStucture) {
+        body = invalidDrinkStucture;
+        break;
+      }
+
+      body = { seatId, drinks };
+
+      /*****  Τσεκ αν βγαζει αοθτπουτ + τσεκ αν δεν υπαρχει σε καποιο απο τα ινπουτ καποιο
+      κει. + φτιαξε τα ντρινκς ******/
+      /* ΦΤΙΑΞΙΜΟ ΤΟ ΕΡΟΡ ΧΑΝΤΛΙΝΓΚ */
       break;
   }
 

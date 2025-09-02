@@ -1,5 +1,5 @@
 const {
-  SET_OF_ERRORS,
+  ERROR_CONSTANTS,
   handleReturningOfRouteFunctions,
 } = require("./helpers/handleErrorsAndReturning");
 
@@ -32,10 +32,10 @@ exports.handler = async (event) => {
       if (seatId) {
         // User entered an id of a seat. Check if the seat exists or return an error
         const seat = await createGetItemCommand("Seats", seatId);
-        body = seat ? seat : SET_OF_ERRORS.INCORRECT_ID;
+        body = seat ? seat : ERROR_CONSTANTS.INCORRECT_ID;
       } else {
         // User entered wrong query string parameter
-        body = SET_OF_ERRORS.INCORRECT_QUERY_PARAM;
+        body = ERROR_CONSTANTS.INCORRECT_QUERY_PARAM;
       }
 
       break;
@@ -44,7 +44,7 @@ exports.handler = async (event) => {
       // User must specify the id of the seat he wants. Then he must specify the action sit or leave
       let eventBody = event["body"] ? JSON.parse(event["body"]) : "";
       if (!eventBody) {
-        body = SET_OF_ERRORS.SEAT_BODY_ABSENT;
+        body = ERROR_CONSTANTS.SEAT_BODY_ABSENT;
         break;
       }
       let paramsKeys = Object.keys(eventBody);
@@ -53,12 +53,12 @@ exports.handler = async (event) => {
         !paramsKeys.includes("id") ||
         !paramsKeys.includes("action")
       ) {
-        body = SET_OF_ERRORS.SEAT_BODY_PARAMS_INCORRECT;
+        body = ERROR_CONSTANTS.SEAT_BODY_PARAMS_INCORRECT;
       } else if (
         eventBody["action"].toLowerCase() !== "sit" &&
         eventBody["action"].toLowerCase() !== "leave"
       ) {
-        body = SET_OF_ERRORS.SEAT_INCORRECT_ACTION;
+        body = ERROR_CONSTANTS.SEAT_INCORRECT_ACTION;
       } else {
         // If action is sit, then value of sit varibable will be true. If action is leave,
         // then sit is false. Action is surely either sit or leave (it is checked aboved)
@@ -75,7 +75,7 @@ exports.handler = async (event) => {
         );
 
         if (change === "PROBLEM") {
-          body = SET_OF_ERRORS.SEAT_INCORRECT_ACTION_OR_ID;
+          body = ERROR_CONSTANTS.SEAT_INCORRECT_ACTION_OR_ID;
           break;
         }
         body = sit ? ACTION_MESSAGES.SAT : ACTION_MESSAGES.LEFT;

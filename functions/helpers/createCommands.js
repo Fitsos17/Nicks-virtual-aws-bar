@@ -59,7 +59,7 @@ exports.createGetItemCommand = async (tableName, id) => {
     const response = await docClient.send(command);
     return response["Item"];
   } catch (error) {
-    throw new Error(error);
+    throw new Error(error.message);
   }
 };
 
