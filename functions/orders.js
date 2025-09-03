@@ -37,14 +37,39 @@ exports.handler = async (event) => {
         return createErrorFunctions.invalidDrinkStructure(drink, "drinkId");
       } else if (!keys.includes("quantity")) {
         return createErrorFunctions.invalidDrinkStructure(drink, "quantity");
-      } else if (
-        Number(drink["quantity"]) <= 0 ||
-        Number(drink["quantity"]) % 1 !== 0
-      ) {
+      }
+      const drinkId = +drink["drinkId"];
+      const quantity = +drink["quantity"];
+      if (Number.isNaN(drinkId) || Number.isNaN(quantity)) {
+        return ERROR_CONSTANTS.INCORRECT_DATA_TYPE;
+      } else if (quantity <= 0 || quantity % 1 !== 0) {
         return createErrorFunctions.invalidQuantity(drink);
       }
     }
     return "";
+  };
+
+  const createOrderObject = async (drinksArray) => {
+    // if the drinkId is in the catalog, then this function
+    // will return an object that contains all of the drinks names,
+    // ids and the total price
+    const drinksArrayForOrder = [];
+    let total = 0;
+    for (let drinkObject of drinksArray) {
+      const drinkId = +drinkObject.drinkId;
+      const quantity = +drinkObject.quantity;
+      const drink = await createGetItemCommand("Catalog", drinkId, [
+        "name",
+        "price",
+      ]);
+      if (!drink) {
+        // if the drink does not exist return an error
+        return createErrorFunctions.invalidOrderId(drinkId);
+      }
+      total += drink.price * quantity;
+      drinksArrayForOrder.push({ drinkId, name: drink["name"], quantity });
+    }
+    return { drinksOrdered: drinksArrayForOrder, totalPrice: total };
   };
 
   switch (event.httpMethod) {
@@ -63,9 +88,16 @@ exports.handler = async (event) => {
         break;
       }
 
-      // check for seatId if it exists and if it is taken (else we return error)
-      const seatId = Number(eventBody["seatId"]);
-      const foundSeat = await createGetItemCommand("Seats", seatId);
+      // 1. Check for seatId if it exists and if it is taken (else we return error)
+      const seatId = +eventBody["seatId"];
+      if (Number.isNaN(seatId)) {
+        body = ERROR_CONSTANTS.INCORRECT_DATA_TYPE;
+        break;
+      }
+      const foundSeat = await createGetItemCommand("Seats", seatId, [
+        "id",
+        "taken",
+      ]);
       if (!foundSeat) {
         body = ERROR_CONSTANTS.ORDER_SEAT_ID_INORRECT;
         break;
@@ -74,7 +106,7 @@ exports.handler = async (event) => {
         break;
       }
 
-      // check drinks structure if is of type [ { drinkId, quantity } ]
+      // 2. Check drinks structure if is of type [ { drinkId, quantity } ]
       const drinks = eventBody["drinks"];
       const invalidDrinkStucture = checkInvalidDrinksStructure(drinks);
       if (invalidDrinkStucture) {
@@ -82,11 +114,32 @@ exports.handler = async (event) => {
         break;
       }
 
-      body = { seatId, drinks };
+      // 3. Loop to find if the drinks exists (get ["id", "price"]) and setup order
+      const orderObject = await createOrderObject(drinks);
+      if (Object.keys(orderObject).includes("errorMessage")) {
+        // if the orderObject includes an errorMessage, then
+        // one of the drink ids entered was not found. So the
+        // drinkObject will be the error object so we assign
+        // that to the body and return it.
+        body = orderObject;
+        break;
+      }
+      body = orderObject;
 
-      /*****  Τσεκ αν βγαζει αοθτπουτ + τσεκ αν δεν υπαρχει σε καποιο απο τα ινπουτ καποιο
-      κει. + φτιαξε τα ντρινκς ******/
-      /* ΦΤΙΑΞΙΜΟ ΤΟ ΕΡΟΡ ΧΑΝΤΛΙΝΓΚ */
+      // Create unique order id
+      // This will be unique, because we get first 4 digits randomly and then
+      // we append to the end the seatId, which is assigned only to the people
+      // that have taken those seats.
+      const orderId = +`${Math.floor(Math.random() * 100000)}_${seatId}`;
+      body["orderId"] = orderId;
+      body["seatId"] = seatId;
+
+      // order object {orderId, seatId, orderObject, paid: false, status: pending | served -> admin, createdAt -> for admin to make first}
+      // 5. Put to eventbridge -> sqs  -> orders table
+
+      // 6. Return {"message": "Your order is in the making. In the meantime, you can enjoy the view
+      // and pay for your drinks. I hope you will enjoy your drink.",  order: {orderObject}}
+
       break;
   }
 

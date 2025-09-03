@@ -19,6 +19,11 @@ const ERROR_CONSTANTS = {
     code: "INCORRECT_QUERY_PARAM",
     errorMessage: "The query parameters you entered is incorrect!",
   },
+  INCORRECT_DATA_TYPE: {
+    code: "INCORRECT_DATA_TYPE",
+    errorMessage:
+      "The data type in one of your inputs is incorrect. Make sure that ids and quantities are numbers",
+  },
 
   // seats
   SEAT_BODY_PARAMS_INCORRECT: {

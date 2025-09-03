@@ -4,6 +4,6 @@ node_modules
 .cdk.staging
 cdk.out
 
-IDEAS.md
+TASKS.md
 ROUTES_TO_DEVELOP.md
 DUMMY_EVENT.json

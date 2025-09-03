@@ -14,11 +14,14 @@ exports.handler = async (event) => {
   const queryParameters = event["queryStringParameters"];
   if (!queryParameters) {
     body = await createScanCommand("Catalog");
+  } else if (!Object.keys("id")) {
+    body = ERROR_CONSTANTS.INCORRECT_DATA_TYPE;
   } else {
-    const idParameter = queryParameters["id"];
-    if (!idParameter) {
-      body = ERROR_CONSTANTS.INCORRECT_QUERY_PARAM;
+    const idParameter = +queryParameters["id"];
+    if (Number.isNaN(idParameter)) {
+      body = ERROR_CONSTANTS.INCORRECT_DATA_TYPE;
     } else {
+      console.log(idParameter);
       const drink = await createGetItemCommand("Catalog", idParameter);
 
       body = drink ? drink : ERROR_CONSTANTS.INCORRECT_ID;

@@ -27,16 +27,21 @@ exports.handler = async (event) => {
         body = await createScanCommand("Seats");
         break;
       }
-
-      const seatId = queryParams["id"];
-      if (seatId) {
-        // User entered an id of a seat. Check if the seat exists or return an error
-        const seat = await createGetItemCommand("Seats", seatId);
-        body = seat ? seat : ERROR_CONSTANTS.INCORRECT_ID;
-      } else {
-        // User entered wrong query string parameter
+      // User entered an id of a seat. Check if the seat exists or return an error
+      else if (!queryParams["id"]) {
+        // incorrect query param
         body = ERROR_CONSTANTS.INCORRECT_QUERY_PARAM;
+        break;
       }
+
+      const seatId = +queryParams["id"];
+      if (Number.isNaN(seatId)) {
+        body = ERROR_CONSTANTS.INCORRECT_DATA_TYPE;
+        break;
+      }
+
+      const seat = await createGetItemCommand("Seats", seatId);
+      body = seat ? seat : ERROR_CONSTANTS.INCORRECT_ID;
 
       break;
 
@@ -54,22 +59,25 @@ exports.handler = async (event) => {
         !paramsKeys.includes("action")
       ) {
         body = ERROR_CONSTANTS.SEAT_BODY_PARAMS_INCORRECT;
-      } else if (
-        eventBody["action"].toLowerCase() !== "sit" &&
-        eventBody["action"].toLowerCase() !== "leave"
-      ) {
+        break;
+      }
+      const action = eventBody["action"].toLowerCase();
+      const id = +eventBody["id"];
+      if (action !== "sit" && action !== "leave") {
         body = ERROR_CONSTANTS.SEAT_INCORRECT_ACTION;
+      } else if (Number.isNaN(id)) {
+        body = ERROR_CONSTANTS.INCORRECT_DATA_TYPE;
       } else {
         // If action is sit, then value of sit varibable will be true. If action is leave,
         // then sit is false. Action is surely either sit or leave (it is checked aboved)
-        const sit = eventBody["action"].toLowerCase() === "sit";
+        const sit = action === "sit";
 
         // if the action is sit, we want the seat to be taken after the request and
         // if the action is leave, we want the seat to not be taken after the request.
         const taken = sit ? true : false;
         const change = await createUpdateItemCommand(
           "Seats",
-          eventBody["id"],
+          id,
           "taken",
           taken
         );

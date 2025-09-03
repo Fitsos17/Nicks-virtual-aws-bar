@@ -57,11 +57,12 @@ exports.createGetItemCommand = async (
     const params = {
       TableName: tableName,
       Key: {
-        id: Number(id),
+        id: +id,
       },
     };
 
     // here we check if we want specific values from the objects
+    // example: if we want only the id and the name ddb returns only that
     if (
       typeof projectionExpression === "object" &&
       projectionExpression.length !== 0
@@ -106,7 +107,7 @@ exports.createUpdateItemCommand = async (
     const command = new UpdateCommand({
       TableName: tableName,
       Key: {
-        id: Number(id),
+        id: +id,
       },
       UpdateExpression: "SET #status = :newStatus",
       ConditionExpression: "attribute_exists(id) AND #status <> :newStatus",
