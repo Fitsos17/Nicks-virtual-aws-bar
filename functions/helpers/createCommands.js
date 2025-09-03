@@ -5,6 +5,7 @@ const {
   GetCommand,
   UpdateCommand,
   BatchGetCommand,
+  QueryCommand,
 } = require("@aws-sdk/lib-dynamodb");
 
 exports.createBatchWriteCommand = async (tableName, items) => {
@@ -54,7 +55,7 @@ exports.createGetItemCommand = async (
   projectionExpression = []
 ) => {
   try {
-    const params = {
+    let input = {
       TableName: tableName,
       Key: {
         id: +id,
@@ -68,10 +69,10 @@ exports.createGetItemCommand = async (
       projectionExpression.length !== 0
     ) {
       // convert to the form -> "id, name, "
-      params["ProjectionExpression"] = projectionExpression
+      input["ProjectionExpression"] = projectionExpression
         .map((val) => `#${val}`)
         .join(", ");
-      params["ExpressionAttributeNames"] = projectionExpression.reduce(
+      input["ExpressionAttributeNames"] = projectionExpression.reduce(
         (acc, val) => {
           acc[`#${val}`] = val;
           return acc;
@@ -79,7 +80,8 @@ exports.createGetItemCommand = async (
         {}
       );
     }
-    const response = await docClient.send(new GetCommand(params));
+    const command = new GetCommand(input);
+    const response = await docClient.send(command);
     return response["Item"];
   } catch (error) {
     throw new Error(error);
@@ -129,5 +131,28 @@ exports.createUpdateItemCommand = async (
 
       return "PROBLEM";
     } else throw new Error(error);
+  }
+};
+
+exports.createQueryCommand = async (tableName, indexName, pk, value) => {
+  try {
+    const input = {
+      TableName: tableName,
+      IndexName: indexName,
+      KeyConditionExpression: "#pk = :val",
+      ExpressionAttributeNames: {
+        "#pk": pk,
+      },
+      ExpressionAttributeValues: {
+        ":val": value,
+      },
+    };
+
+    console.log(input);
+    const command = new QueryCommand(input);
+    const result = await docClient.send(command);
+    return result["Items"];
+  } catch (error) {
+    throw new Error(error);
   }
 };
