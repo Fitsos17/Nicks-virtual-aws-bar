@@ -49,6 +49,11 @@ const ERROR_CONSTANTS = {
     errorMessage:
       "The id you entered is incorrect or someone just took/left this seat. Please enter a different action/id!",
   },
+  INCORRECT_SEAT_TYPE: {
+    code: "INCORRECT_SEAT_TYPE",
+    errorMessage:
+      "The seat type you entered is incorrect. Please enter a valid seat type",
+  },
 
   // orders
   ORDERS_INCORRECT_BODY: {

@@ -133,6 +133,7 @@ exports.handler = async (event) => {
       const orderId = +`${Math.floor(Math.random() * 100000)}_${seatId}`;
       body["orderId"] = orderId;
       body["seatId"] = seatId;
+      body["paid"] = false;
 
       // order object {orderId, seatId, orderObject, paid: false, status: pending | served -> admin, createdAt -> for admin to make first}
       // 5. Put to eventbridge -> sqs  -> orders table

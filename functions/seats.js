@@ -7,6 +7,7 @@ const {
   createScanCommand,
   createGetItemCommand,
   createUpdateItemCommand,
+  createQueryCommand,
 } = require("./helpers/createCommands");
 
 const ACTION_MESSAGES = {
@@ -28,20 +29,31 @@ exports.handler = async (event) => {
         break;
       }
       // User entered an id of a seat. Check if the seat exists or return an error
-      else if (!queryParams["id"]) {
+      else if (queryParams["id"]) {
+        const seatId = +queryParams["id"];
+        if (Number.isNaN(seatId)) {
+          body = ERROR_CONSTANTS.INCORRECT_DATA_TYPE;
+          break;
+        }
+
+        const seat = await createGetItemCommand("Seats", seatId);
+        body = seat ? seat : ERROR_CONSTANTS.INCORRECT_ID;
+      } else if (queryParams["seatType"]) {
+        // use json.parse because value in command
+        // will be example `"sunbed"`
+        const type = queryParams["seatType"];
+        const result = await createQueryCommand(
+          "Seats",
+          "SeatTypeIndex",
+          "type",
+          type
+        );
+        body =
+          result.length !== 0 ? result : ERROR_CONSTANTS.INCORRECT_SEAT_TYPE;
+      } else {
         // incorrect query param
         body = ERROR_CONSTANTS.INCORRECT_QUERY_PARAM;
-        break;
       }
-
-      const seatId = +queryParams["id"];
-      if (Number.isNaN(seatId)) {
-        body = ERROR_CONSTANTS.INCORRECT_DATA_TYPE;
-        break;
-      }
-
-      const seat = await createGetItemCommand("Seats", seatId);
-      body = seat ? seat : ERROR_CONSTANTS.INCORRECT_ID;
 
       break;
 
