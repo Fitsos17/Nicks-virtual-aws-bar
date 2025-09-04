@@ -1,4 +1,7 @@
-const { createGetItemCommand } = require("./helpers/createCommands");
+const {
+  createGetCommand,
+  createPutCommand,
+} = require("./helpers/createCommands");
 const {
   handleReturningOfRouteFunctions,
   ERROR_CONSTANTS,
@@ -15,20 +18,8 @@ exports.handler = async (event) => {
    * status -> peding | served
    * seat must have another attribute: payment: {total, paid, paymentMethod}
    * Orders handled by sqs, eventbridge and ddb
-    {
-      orderId: randomizer 5 χαρακτηρες + το seatid στο τελος ετσι θα ειναι unique,
-      drinks: [
-        {
-          drinkId,
-          quantity
-        },
-        ...
-      ],
-      total: 728 euros
-      status: pending | served,
-      paid: true | false
-    }
-  */
+   * An order is deleted when it is served and paid. Order is deleted when the user leaves the seat.
+   */
 
   const checkInvalidDrinksStructure = (drinksArray) => {
     for (let drink of drinksArray) {
@@ -56,9 +47,14 @@ exports.handler = async (event) => {
     const drinksArrayForOrder = [];
     let total = 0;
     for (let drinkObject of drinksArray) {
+      // I do not use batch get, because if we query 10 items and the
+      // 5th item does not exist, then we will get 9 items with the
+      // batch command and then we need to check which is missing,
+      // but with the single get we will get 4 and then we will have
+      // the id of the non existant drink.
       const drinkId = +drinkObject.drinkId;
       const quantity = +drinkObject.quantity;
-      const drink = await createGetItemCommand("Catalog", drinkId, [
+      const drink = await createGetCommand("Catalog", drinkId, [
         "name",
         "price",
       ]);
@@ -94,7 +90,7 @@ exports.handler = async (event) => {
         body = ERROR_CONSTANTS.INCORRECT_DATA_TYPE;
         break;
       }
-      const foundSeat = await createGetItemCommand("Seats", seatId, [
+      const foundSeat = await createGetCommand("Seats", seatId, [
         "id",
         "taken",
       ]);
@@ -116,6 +112,7 @@ exports.handler = async (event) => {
 
       // 3. Loop to find if the drinks exists (get ["id", "price"]) and setup order
       const orderObject = await createOrderObject(drinks);
+
       if (Object.keys(orderObject).includes("errorMessage")) {
         // if the orderObject includes an errorMessage, then
         // one of the drink ids entered was not found. So the
@@ -124,23 +121,30 @@ exports.handler = async (event) => {
         body = orderObject;
         break;
       }
-      body = orderObject;
 
-      // Create unique order id
-      // This will be unique, because we get first 4 digits randomly and then
-      // we append to the end the seatId, which is assigned only to the people
-      // that have taken those seats.
-      const orderId = +`${Math.floor(Math.random() * 100000)}_${seatId}`;
-      body["orderId"] = orderId;
-      body["seatId"] = seatId;
-      body["paid"] = false;
+      // Create unique order id with time point and seat id.
+      const time = Math.round(new Date().getTime());
+      const orderId = `${time}_${seatId}`;
 
-      // order object {orderId, seatId, orderObject, paid: false, status: pending | served -> admin, createdAt -> for admin to make first}
+      orderObject["id"] = orderId;
+      orderObject["seatId"] = seatId;
+      orderObject["createdAt"] = time;
+      orderObject["paid"] = false;
+      orderObject["status"] = "pending";
+
+      /* For now I will put items directly to ddb */
+      await createPutCommand("Orders", orderObject);
+
       // 5. Put to eventbridge -> sqs  -> orders table
 
       // 6. Return {"message": "Your order is in the making. In the meantime, you can enjoy the view
       // and pay for your drinks. I hope you will enjoy your drink.",  order: {orderObject}}
-
+      body = {
+        message: `Your order is being processed. You can check the status of your drinks by going to this link: /orders?orderId=${orderId}. As the drinks are being made, you can pay and enjoy the beautiful view! 🌴`,
+        yourOrder: {
+          orderObject,
+        },
+      };
       break;
   }
 
