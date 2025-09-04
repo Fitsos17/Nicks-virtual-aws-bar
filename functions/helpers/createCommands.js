@@ -4,10 +4,11 @@ const {
   ScanCommand,
   GetCommand,
   UpdateCommand,
-  BatchGetCommand,
   QueryCommand,
+  PutCommand,
 } = require("@aws-sdk/lib-dynamodb");
 
+// for update functions
 exports.createBatchWriteCommand = async (tableName, items) => {
   try {
     const input = {
@@ -27,33 +28,19 @@ exports.createBatchWriteCommand = async (tableName, items) => {
   }
 };
 
-exports.createBatchGetCommand = async (tableName, ids, attributesToGet) => {
+// get items
+exports.createScanCommand = async (tableName) => {
   try {
-    const input = {
-      RequestItems: {
-        [tableName]: {
-          Keys: ids.map((id) => ({ id })),
-          // must be of form "xyz, jas, lso" with attributes that exist in each table
-          ProjectionExpression: attributesToGet,
-        },
-      },
-    };
-
-    const result = await docClient.send(new BatchGetCommand(input));
-
-    const items = result.Responses?.[tableName];
-
+    const command = new ScanCommand({ TableName: tableName });
+    const response = await docClient.send(command);
+    const items = response["Items"];
     return items;
   } catch (error) {
     throw new Error(error);
   }
 };
 
-exports.createGetItemCommand = async (
-  tableName,
-  id,
-  projectionExpression = []
-) => {
+exports.createGetCommand = async (tableName, id, projectionExpression = []) => {
   try {
     let input = {
       TableName: tableName,
@@ -88,23 +75,31 @@ exports.createGetItemCommand = async (
   }
 };
 
-exports.createScanCommand = async (tableName) => {
+exports.createQueryCommand = async (tableName, indexName, pk, value) => {
   try {
-    const command = new ScanCommand({ TableName: tableName });
-    const response = await docClient.send(command);
-    const items = response["Items"];
-    return items;
+    const input = {
+      TableName: tableName,
+      IndexName: indexName,
+      KeyConditionExpression: "#pk = :val",
+      ExpressionAttributeNames: {
+        "#pk": pk,
+      },
+      ExpressionAttributeValues: {
+        ":val": value,
+      },
+    };
+
+    console.log(input);
+    const command = new QueryCommand(input);
+    const result = await docClient.send(command);
+    return result["Items"];
   } catch (error) {
     throw new Error(error);
   }
 };
 
-exports.createUpdateItemCommand = async (
-  tableName,
-  id,
-  attrName,
-  attrValue
-) => {
+// update items
+exports.createUpdateCommand = async (tableName, id, attrName, attrValue) => {
   try {
     const command = new UpdateCommand({
       TableName: tableName,
@@ -134,24 +129,15 @@ exports.createUpdateItemCommand = async (
   }
 };
 
-exports.createQueryCommand = async (tableName, indexName, pk, value) => {
+// create items
+exports.createPutCommand = async (tableName, item) => {
   try {
     const input = {
       TableName: tableName,
-      IndexName: indexName,
-      KeyConditionExpression: "#pk = :val",
-      ExpressionAttributeNames: {
-        "#pk": pk,
-      },
-      ExpressionAttributeValues: {
-        ":val": value,
-      },
+      Item: item,
     };
-
-    console.log(input);
-    const command = new QueryCommand(input);
-    const result = await docClient.send(command);
-    return result["Items"];
+    const command = new PutCommand(input);
+    await docClient.send(command);
   } catch (error) {
     throw new Error(error);
   }

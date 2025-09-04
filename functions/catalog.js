@@ -1,5 +1,5 @@
 const {
-  createGetItemCommand,
+  createGetCommand,
   createScanCommand,
 } = require("./helpers/createCommands");
 const {
@@ -22,7 +22,7 @@ exports.handler = async (event) => {
       body = ERROR_CONSTANTS.INCORRECT_DATA_TYPE;
     } else {
       console.log(idParameter);
-      const drink = await createGetItemCommand("Catalog", idParameter);
+      const drink = await createGetCommand("Catalog", idParameter);
 
       body = drink ? drink : ERROR_CONSTANTS.INCORRECT_ID;
     }

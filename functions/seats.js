@@ -5,8 +5,8 @@ const {
 
 const {
   createScanCommand,
-  createGetItemCommand,
-  createUpdateItemCommand,
+  createGetCommand,
+  createUpdateCommand,
   createQueryCommand,
 } = require("./helpers/createCommands");
 
@@ -36,7 +36,7 @@ exports.handler = async (event) => {
           break;
         }
 
-        const seat = await createGetItemCommand("Seats", seatId);
+        const seat = await createGetCommand("Seats", seatId);
         body = seat ? seat : ERROR_CONSTANTS.INCORRECT_ID;
       } else if (queryParams["seatType"]) {
         // use json.parse because value in command
@@ -87,12 +87,7 @@ exports.handler = async (event) => {
         // if the action is sit, we want the seat to be taken after the request and
         // if the action is leave, we want the seat to not be taken after the request.
         const taken = sit ? true : false;
-        const change = await createUpdateItemCommand(
-          "Seats",
-          id,
-          "taken",
-          taken
-        );
+        const change = await createUpdateCommand("Seats", id, "taken", taken);
 
         if (change === "PROBLEM") {
           body = ERROR_CONSTANTS.SEAT_INCORRECT_ACTION_OR_ID;
