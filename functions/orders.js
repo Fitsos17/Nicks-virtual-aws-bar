@@ -91,9 +91,10 @@ exports.handler = async (event) => {
           "seatId",
           seatId
         );
-        body = ordersBySeat
-          ? ordersBySeat
-          : ERROR_CONSTANTS.ORDERS_NO_ORDERS_FOR_THIS_SEAT;
+        body =
+          ordersBySeat.length !== 0
+            ? ordersBySeat
+            : ERROR_CONSTANTS.ORDERS_NO_ORDERS_FOR_THIS_SEAT;
       }
       break;
 
