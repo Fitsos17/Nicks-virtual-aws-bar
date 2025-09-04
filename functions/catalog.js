@@ -21,7 +21,6 @@ exports.handler = async (event) => {
     if (Number.isNaN(idParameter)) {
       body = ERROR_CONSTANTS.INCORRECT_DATA_TYPE;
     } else {
-      console.log(idParameter);
       const drink = await createGetCommand("Catalog", idParameter);
 
       body = drink ? drink : ERROR_CONSTANTS.INCORRECT_ID;

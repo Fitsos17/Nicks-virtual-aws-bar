@@ -17,7 +17,7 @@ const ERROR_CONSTANTS = {
   },
   INCORRECT_QUERY_PARAM: {
     code: "INCORRECT_QUERY_PARAM",
-    errorMessage: "The query parameters you entered is incorrect!",
+    errorMessage: "The query parameters you entered are incorrect!",
   },
   INCORRECT_DATA_TYPE: {
     code: "INCORRECT_DATA_TYPE",
@@ -61,14 +61,24 @@ const ERROR_CONSTANTS = {
     errorMessage:
       "The body you have entered is incorrect. You must enter the seatId and the drinks you want to order, including the id and the quantity of each drink.",
   },
-  ORDER_SEAT_ID_INORRECT: {
-    code: "ORDER_SEAT_ID_INORRECT",
+  ORDERS_SEAT_ID_INORRECT: {
+    code: "ORDERS_SEAT_ID_INORRECT",
     errorMessage:
       "The seatId you entered does not exist. Enter a different one and try again!",
   },
-  ORDER_SEAT_NOT_TAKEN: {
-    code: "ORDER_SEAT_NOT_TAKEN",
+  ORDERS_SEAT_NOT_TAKEN: {
+    code: "ORDERS_SEAT_NOT_TAKEN",
     errorMessage: "To order from a specific table, you firstly must sit in it!",
+  },
+  ORDERS_INCORRECT_ORDER_ID: {
+    code: "ORDERS_INCORRECT_ORDER_ID",
+    errorMessage:
+      "The order id you entered does not correspond to any order. Enter a different one and try again.",
+  },
+  ORDERS_NO_ORDERS_FOR_THIS_SEAT: {
+    code: "ORDERS_NO_ORDERS_FOR_THIS_SEAT",
+    errorMessage:
+      "There are no orders for this seat id. Make sure that this is the correct seat id and that you have made any orders.",
   },
 };
 

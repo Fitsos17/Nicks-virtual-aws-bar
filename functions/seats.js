@@ -12,7 +12,7 @@ const {
 
 const ACTION_MESSAGES = {
   SAT: {
-    sat: "You have taken this sit. Check our catalog in /catalog and whenever you are ready order at /order! 🍾",
+    sat: "You have taken this seat. Check our catalog in /catalog and whenever you are ready order at /order! 🍾",
   },
   LEFT: { left: "Thanks for sitting at my bar! I hope to see you soon 👋" },
 };

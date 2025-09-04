@@ -45,7 +45,7 @@ exports.createGetCommand = async (tableName, id, projectionExpression = []) => {
     let input = {
       TableName: tableName,
       Key: {
-        id: +id,
+        id: id,
       },
     };
 

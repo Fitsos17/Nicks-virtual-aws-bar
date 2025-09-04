@@ -1,6 +1,7 @@
 const {
   createGetCommand,
   createPutCommand,
+  createQueryCommand,
 } = require("./helpers/createCommands");
 const {
   handleReturningOfRouteFunctions,
@@ -10,17 +11,8 @@ const {
 
 exports.handler = async (event) => {
   let body;
-  /********* STRUCTURE ****************/
-  /**
-   * Methods: GET, POST
-   * seatId only => get all drinks, quantities, status and total price
-   * setId and drinkId => get the drink, quantity, status and price
-   * status -> peding | served
-   * seat must have another attribute: payment: {total, paid, paymentMethod}
-   * Orders handled by sqs, eventbridge and ddb
-   * An order is deleted when it is served and paid. Order is deleted when the user leaves the seat.
-   */
 
+  // functions
   const checkInvalidDrinksStructure = (drinksArray) => {
     for (let drink of drinksArray) {
       const keys = Object.keys(drink);
@@ -68,7 +60,43 @@ exports.handler = async (event) => {
     return { drinksOrdered: drinksArrayForOrder, totalPrice: total };
   };
 
+  /**
+   * Methods: GET, POST
+   * seatId only => get all drinks, quantities, status and total price
+   * setId and drinkId => get the drink, quantity, status and price
+   * status -> peding | served
+   * seat must have another attribute: payment: {total, paid, paymentMethod}
+   * Orders handled by sqs, eventbridge and ddb
+   * An order is deleted when it is served and paid. Order is deleted when the user leaves the seat.
+   */
   switch (event.httpMethod) {
+    case "GET":
+      const queryParams = event["queryStringParameters"];
+      if (!queryParams) {
+        body = ERROR_CONSTANTS.INCORRECT_QUERY_PARAM;
+        break;
+      }
+      const orderId = queryParams["orderId"];
+      const seatId = +queryParams["seatId"];
+
+      if (orderId) {
+        const order = await createGetCommand("Orders", orderId);
+        body = order ? order : ERROR_CONSTANTS.ORDERS_INCORRECT_ORDER_ID;
+      } else if (seatId) {
+        // We do not want to check which person sees the order. Maybe
+        // someone else want to pay for the table
+        const ordersBySeat = await createQueryCommand(
+          "Orders",
+          "SeatIdIndex",
+          "seatId",
+          seatId
+        );
+        body = ordersBySeat
+          ? ordersBySeat
+          : ERROR_CONSTANTS.ORDERS_NO_ORDERS_FOR_THIS_SEAT;
+      }
+      break;
+
     case "POST":
       let eventBody = event["body"] ? JSON.parse(event["body"]) : "";
       // check for bad input
@@ -85,20 +113,20 @@ exports.handler = async (event) => {
       }
 
       // 1. Check for seatId if it exists and if it is taken (else we return error)
-      const seatId = +eventBody["seatId"];
-      if (Number.isNaN(seatId)) {
+      const bodySeatId = +eventBody["seatId"];
+      if (Number.isNaN(bodySeatId)) {
         body = ERROR_CONSTANTS.INCORRECT_DATA_TYPE;
         break;
       }
-      const foundSeat = await createGetCommand("Seats", seatId, [
+      const foundSeat = await createGetCommand("Seats", bodySeatId, [
         "id",
         "taken",
       ]);
       if (!foundSeat) {
-        body = ERROR_CONSTANTS.ORDER_SEAT_ID_INORRECT;
+        body = ERROR_CONSTANTS.ORDERS_SEAT_ID_INORRECT;
         break;
       } else if (!foundSeat.taken) {
-        body = ERROR_CONSTANTS.ORDER_SEAT_NOT_TAKEN;
+        body = ERROR_CONSTANTS.ORDERS_SEAT_NOT_TAKEN;
         break;
       }
 
@@ -124,10 +152,10 @@ exports.handler = async (event) => {
 
       // Create unique order id with time point and seat id.
       const time = Math.round(new Date().getTime());
-      const orderId = `${time}_${seatId}`;
+      const generatedOrderId = `${time}_${bodySeatId}`;
 
-      orderObject["id"] = orderId;
-      orderObject["seatId"] = seatId;
+      orderObject["id"] = generatedOrderId;
+      orderObject["seatId"] = bodySeatId;
       orderObject["createdAt"] = time;
       orderObject["paid"] = false;
       orderObject["status"] = "pending";
@@ -140,7 +168,7 @@ exports.handler = async (event) => {
       // 6. Return {"message": "Your order is in the making. In the meantime, you can enjoy the view
       // and pay for your drinks. I hope you will enjoy your drink.",  order: {orderObject}}
       body = {
-        message: `Your order is being processed. You can check the status of your drinks by going to this link: /orders?orderId=${orderId}. As the drinks are being made, you can pay and enjoy the beautiful view! 🌴`,
+        message: `Your order is being processed. You can check the status of your drinks by going to this path: /orders?orderId=${generatedOrderId} . As the drinks are being made, you can pay and enjoy the beautiful view! 🌴`,
         yourOrder: {
           orderObject,
         },
