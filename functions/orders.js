@@ -163,6 +163,9 @@ exports.handler = async (event) => {
       orderObject["paid"] = false;
       orderObject["status"] = "pending";
 
+      // expire every order object after 8hrs if not completed
+      orderObject["expiresAt"] = Math.floor(Date.now() / 1000) + 8 * 3600;
+
       /* For now I will put items directly to ddb */
       await createPutCommand("Orders", orderObject);
 
