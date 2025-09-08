@@ -79,6 +79,8 @@ exports.handler = async (event) => {
       const orderId = queryParams["orderId"];
       const seatId = +queryParams["seatId"];
 
+      // you can get the orders from other tables and pay for them
+      // if you want to. They will like it a lot
       if (orderId) {
         const order = await createGetCommand("Orders", orderId);
         body = order ? order : ERROR_CONSTANTS.ORDERS_INCORRECT_ORDER_ID;
