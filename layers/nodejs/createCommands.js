@@ -1,4 +1,4 @@
-const docClient = require("./docClient");
+const docClient = require("/opt/docClient");
 const {
   BatchWriteCommand,
   ScanCommand,

@@ -1,7 +1,7 @@
 const {
   handleReturningOfUpdateFunctions,
-} = require("./helpers/handleErrorsAndReturning");
-const { createBatchWriteCommand } = require("./helpers/createCommands");
+} = require("/opt/handleErrorsAndReturning");
+const { createBatchWriteCommand } = require("/opt/createCommands");
 
 exports.handler = async (event) => {
   const seats = [

@@ -1,7 +1,6 @@
 const {
   handleReturningOfRouteFunctions,
-  ERROR_CONSTANTS,
-} = require("./helpers/handleErrorsAndReturning");
+} = require("/opt/handleErrorsAndReturning");
 
 exports.handler = async (event) => {
   let body;

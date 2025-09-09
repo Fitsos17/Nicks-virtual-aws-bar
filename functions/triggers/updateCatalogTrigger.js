@@ -1,7 +1,7 @@
-const { createBatchWriteCommand } = require("./helpers/createCommands");
+const { createBatchWriteCommand } = require("/opt/createCommands");
 const {
   handleReturningOfUpdateFunctions,
-} = require("./helpers/handleErrorsAndReturning");
+} = require("/opt/handleErrorsAndReturning");
 
 exports.handler = async (event) => {
   const items = [

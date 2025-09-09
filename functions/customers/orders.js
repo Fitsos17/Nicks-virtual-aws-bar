@@ -2,12 +2,12 @@ const {
   createGetCommand,
   createPutCommand,
   createQueryCommand,
-} = require("./helpers/createCommands");
+} = require("/opt/createCommands");
 const {
   handleReturningOfRouteFunctions,
   ERROR_CONSTANTS,
   createErrorFunctions,
-} = require("./helpers/handleErrorsAndReturning");
+} = require("/opt/handleErrorsAndReturning");
 
 exports.handler = async (event) => {
   let body;
@@ -168,8 +168,6 @@ exports.handler = async (event) => {
 
       /* For now I will put items directly to ddb */
       await createPutCommand("Orders", orderObject);
-
-      // 5. Put to eventbridge -> sqs  -> orders table
 
       // 6. Return {"message": "Your order is in the making. In the meantime, you can enjoy the view
       // and pay for your drinks. I hope you will enjoy your drink.",  order: {orderObject}}

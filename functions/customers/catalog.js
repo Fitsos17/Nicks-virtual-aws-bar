@@ -1,11 +1,8 @@
-const {
-  createGetCommand,
-  createScanCommand,
-} = require("./helpers/createCommands");
+const { createGetCommand, createScanCommand } = require("/opt/createCommands");
 const {
   ERROR_CONSTANTS,
   handleReturningOfRouteFunctions,
-} = require("./helpers/handleErrorsAndReturning");
+} = require("/opt/handleErrorsAndReturning");
 
 exports.handler = async (event) => {
   let body;

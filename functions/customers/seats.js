@@ -1,14 +1,14 @@
 const {
   ERROR_CONSTANTS,
   handleReturningOfRouteFunctions,
-} = require("./helpers/handleErrorsAndReturning");
+} = require("/opt/handleErrorsAndReturning");
 
 const {
   createScanCommand,
   createGetCommand,
   createUpdateCommand,
   createQueryCommand,
-} = require("./helpers/createCommands");
+} = require("/opt/createCommands");
 
 const ACTION_MESSAGES = {
   SAT: {
