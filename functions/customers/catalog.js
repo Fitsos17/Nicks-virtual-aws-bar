@@ -10,7 +10,7 @@ exports.handler = async (event) => {
   // User types the id of the drink. If he doesn't, he gets all the drinks.
   const queryParameters = event["queryStringParameters"];
   if (!queryParameters) {
-    body = await createScanCommand("Catalog");
+    body = await createScanCommand("Catalog", ["id", "name"]);
   } else if (!Object.keys("id")) {
     body = ERROR_CONSTANTS.INCORRECT_DATA_TYPE;
   } else {

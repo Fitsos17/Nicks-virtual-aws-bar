@@ -8,6 +8,32 @@ const {
   PutCommand,
 } = require("@aws-sdk/lib-dynamodb");
 
+const createScanGetInput = (initialInput, attributesToGetArray) => {
+  if (!attributesToGetArray) {
+    return initialInput;
+  }
+  if (!Array.isArray(attributesToGetArray)) {
+    throw new Error(
+      `Incorrect data type for getAttributesArray. Passed ${typeof attributesToGetArray}: ${attributesToGetArray}`
+    );
+  } else if (attributesToGetArray.length === 0) {
+    throw new Error(
+      `Don't pass anything for attributesToGet if you want all the elements. Detected empty array when scanning table: ${tableName}`
+    );
+  }
+
+  const handleProjectionExpression = {};
+  handleProjectionExpression["ProjectionExpression"] = attributesToGetArray
+    .map((val) => `#${val}`)
+    .join(", ");
+  handleProjectionExpression["ExpressionAttributeNames"] =
+    attributesToGetArray.reduce((acc, val) => {
+      acc[`#${val}`] = val;
+      return acc;
+    }, {});
+  return { ...initialInput, ...handleProjectionExpression };
+};
+
 // for update functions
 exports.createBatchWriteCommand = async (tableName, items) => {
   try {
@@ -29,9 +55,13 @@ exports.createBatchWriteCommand = async (tableName, items) => {
 };
 
 // get items
-exports.createScanCommand = async (tableName) => {
+exports.createScanCommand = async (tableName, attributesToGetArray) => {
   try {
-    const command = new ScanCommand({ TableName: tableName });
+    const initialInput = { TableName: tableName };
+    const input = createScanGetInput(initialInput, attributesToGetArray);
+
+    const command = new ScanCommand(input);
+
     const response = await docClient.send(command);
     const items = response["Items"];
     return items;
@@ -40,33 +70,17 @@ exports.createScanCommand = async (tableName) => {
   }
 };
 
-exports.createGetCommand = async (tableName, id, projectionExpression = []) => {
+exports.createGetCommand = async (tableName, id, attributesToGetArray) => {
   try {
-    let input = {
+    const initialInput = {
       TableName: tableName,
       Key: {
         id: id,
       },
     };
 
-    // here we check if we want specific values from the objects
-    // example: if we want only the id and the name ddb returns only that
-    if (
-      typeof projectionExpression === "object" &&
-      projectionExpression.length !== 0
-    ) {
-      // convert to the form -> "id, name, "
-      input["ProjectionExpression"] = projectionExpression
-        .map((val) => `#${val}`)
-        .join(", ");
-      input["ExpressionAttributeNames"] = projectionExpression.reduce(
-        (acc, val) => {
-          acc[`#${val}`] = val;
-          return acc;
-        },
-        {}
-      );
-    }
+    const input = createScanGetInput(initialInput, attributesToGetArray);
+
     const command = new GetCommand(input);
     const response = await docClient.send(command);
     return response["Item"];
