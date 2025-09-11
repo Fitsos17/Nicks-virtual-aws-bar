@@ -1,5 +1,5 @@
 const docClient = require("/opt/docClient");
-
+const bedrockClient = require("/opt/bedrockClient");
 const {
   BatchWriteCommand,
   ScanCommand,
@@ -8,6 +8,8 @@ const {
   QueryCommand,
   PutCommand,
 } = require("@aws-sdk/lib-dynamodb");
+
+const { InvokeModelCommand } = require("@aws-sdk/client-bedrock-runtime");
 
 const createScanGetInput = (initialInput, attributesToGetArray) => {
   // for seats we need to check only seats that are not taken
@@ -149,6 +151,41 @@ exports.sendBatchWriteCommand = async (tableName, items) => {
     const command = new BatchWriteCommand(input);
 
     await docClient.send(command);
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+// invoke ai model
+exports.sendInvokeClientCommand = async (prompt) => {
+  try {
+    const input = {
+      modelId: "amazon.nova-micro-v1:0",
+      contentType: "application/json",
+      accept: "application/json",
+      body: JSON.stringify({
+        messages: [
+          {
+            role: "user",
+            content: [
+              {
+                text: prompt,
+              },
+            ],
+          },
+        ],
+      }),
+      inferenceConfig: {
+        temperature: 1,
+        maxTokens: 300,
+      },
+    };
+
+    const command = new InvokeModelCommand(input);
+    const response = await bedrockClient.send(command);
+    const decoded = JSON.parse(new TextDecoder().decode(response.body));
+    const text = JSON.parse(decoded["output"]["message"]["content"][0]["text"]);
+    return text;
   } catch (error) {
     throw new Error(error);
   }
