@@ -36,11 +36,15 @@ I will use AWS services and the AWS Javascript CDK
 
 # Prompts that I used
 
-For generating tables, bar seats and sunbeds: (seats.js and database)
-`Generate a JSON array for my bar that will have the following properties: Every object have the following structure: {id, number_of_seats, type, tableType(only for the tables array), comments, taken}. The id will be a unique number for the seat, type will be one of the following: bar stool, sunbed, table number_of_seats will be the number of seats you are going to have in each table/bar seat/sunbeds (bar seat must have only one seat, sunbeds must have 2), type will be square or circle, comments will be a very small description for the seat, and taken will be a boolean (set to false). Generate 10 bar seats, 4 tables and 6 duos of sunbeds. Generate just the object, no additional text.`
+I use the aws nova micro ai model from bedrock. Prompts:
 
-For generating drinks: (catalog.js and database)
-`Generate a catalog for my bar in a javascript array, with the following structure: An array of 10 drinks objects. All the drinks objects will have this structure: {id, name, ingredients, description, type, price}. id will be a unique id for each drink, name will be the name of the drink with an emoji at the right that describes the drink, ingredients will be the ingredients of the drink (will be a single string and not an array), description will be a small and attractive description that will make the customer buy the drink, type will be the type of the drink (whiskey, cocktail, burbon) with one drink being the "special" and prcice the price of the drink. Generate just the array, no additional text`
+- For generating tables, bar seats and sunbeds (seats.js and database):
+
+  `Generate a JSON array of seating objects for a bar. Each object has: id, number_of_seats (1 to max per type), type (bar stool, table, sunbed), tableType (only if type is table), comments (describe the seat) and taken (false). I want: 5 <= number of bar stools <= 10; 4 <= number of sunbeds <= 7; 10 tables Generate plain text, no JSON wrapper and additional textes`
+
+- For generating drinks (catalog.js and database):
+
+  `Generate a plain text JSON array of 10 drink objects with the structure: {id, name, ingredients, description, type, price}. Each drink must have a unique id, an emoji after the name, ingredients as a single string, an enticing description, and a type (whiskey, cocktail, burbon), with one being "special". Include prices. Use a plain text, no json wrapper and additional text`
 
 # How to setup this api and which policies to have
 
