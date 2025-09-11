@@ -9,29 +9,26 @@ const {
 } = require("@aws-sdk/lib-dynamodb");
 
 const createScanGetInput = (initialInput, attributesToGetArray) => {
-  if (!attributesToGetArray) {
-    return initialInput;
-  }
-  if (!Array.isArray(attributesToGetArray)) {
-    throw new Error(
-      `Incorrect data type for getAttributesArray. Passed ${typeof attributesToGetArray}: ${attributesToGetArray}`
-    );
-  } else if (attributesToGetArray.length === 0) {
-    throw new Error(
-      `Don't pass anything for attributesToGet if you want all the elements. Detected empty array when scanning table: ${tableName}`
+  // for seats we need to check only seats that are not taken
+  let finalInput =
+    initialInput["TableName"] === "Seats"
+      ? { ...initialInput, FilterExpression: "taken <> false" }
+      : { ...initialInput };
+
+  if (attributesToGetArray) {
+    finalInput["ProjectionExpression"] = attributesToGetArray
+      .map((val) => `#${val}`)
+      .join(", ");
+    finalInput["ExpressionAttributeNames"] = attributesToGetArray.reduce(
+      (acc, val) => {
+        acc[`#${val}`] = val;
+        return acc;
+      },
+      {}
     );
   }
 
-  const handleProjectionExpression = {};
-  handleProjectionExpression["ProjectionExpression"] = attributesToGetArray
-    .map((val) => `#${val}`)
-    .join(", ");
-  handleProjectionExpression["ExpressionAttributeNames"] =
-    attributesToGetArray.reduce((acc, val) => {
-      acc[`#${val}`] = val;
-      return acc;
-    }, {});
-  return { ...initialInput, ...handleProjectionExpression };
+  return finalInput;
 };
 
 // for update functions
@@ -118,7 +115,7 @@ exports.createUpdateCommand = async (tableName, id, attrName, attrValue) => {
     const command = new UpdateCommand({
       TableName: tableName,
       Key: {
-        id: +id,
+        id: id,
       },
       UpdateExpression: "SET #status = :newStatus",
       ConditionExpression: "attribute_exists(id) AND #status <> :newStatus",

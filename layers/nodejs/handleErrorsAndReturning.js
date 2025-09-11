@@ -1,9 +1,6 @@
 const createResponse = (statusCode, data) => {
   return {
     statusCode: statusCode,
-    headers: {
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify(data),
   };
 };
@@ -22,7 +19,7 @@ const ERROR_CONSTANTS = {
   INCORRECT_DATA_TYPE: {
     code: "INCORRECT_DATA_TYPE",
     errorMessage:
-      "The data type in one of your inputs is incorrect. Make sure that ids and quantities are numbers",
+      "The data type in one of your inputs is incorrect. Make sure that ids are strings and quantities are numbers",
   },
 
   // seats
@@ -42,6 +39,12 @@ const ERROR_CONSTANTS = {
     code: "SEAT_INCORRECT_ACTION",
     errorMessage:
       "The action you performed is incorrect. You can only sit or leave!",
+  },
+
+  NO_SEAT_AVAILABLE: {
+    code: "NO_SEAT_AVAILABLE",
+    errorMessage:
+      "OOPS! There is no seat available at the moment. Check again later!",
   },
   // for seats ddb response
   SEAT_INCORRECT_ACTION_OR_ID: {

@@ -21,9 +21,8 @@ exports.handler = async (event) => {
       } else if (!keys.includes("quantity")) {
         return createErrorFunctions.invalidDrinkStructure(drink, "quantity");
       }
-      const drinkId = +drink["drinkId"];
       const quantity = +drink["quantity"];
-      if (Number.isNaN(drinkId) || Number.isNaN(quantity)) {
+      if (Number.isNaN(quantity)) {
         return ERROR_CONSTANTS.INCORRECT_DATA_TYPE;
       } else if (quantity <= 0 || quantity % 1 !== 0) {
         return createErrorFunctions.invalidQuantity(drink);
@@ -44,7 +43,7 @@ exports.handler = async (event) => {
       // batch command and then we need to check which is missing,
       // but with the single get we will get 4 and then we will have
       // the id of the non existant drink.
-      const drinkId = +drinkObject.drinkId;
+      const drinkId = drinkObject.drinkId;
       const quantity = +drinkObject.quantity;
       const drink = await createGetCommand("Catalog", drinkId, [
         "name",
@@ -77,7 +76,7 @@ exports.handler = async (event) => {
         break;
       }
       const orderId = queryParams["orderId"];
-      const seatId = +queryParams["seatId"];
+      const seatId = queryParams["seatId"];
 
       // you can get the orders from other tables and pay for them
       // if you want to. They will like it a lot
@@ -116,7 +115,7 @@ exports.handler = async (event) => {
       }
 
       // 1. Check for seatId if it exists and if it is taken (else we return error)
-      const bodySeatId = +eventBody["seatId"];
+      const bodySeatId = eventBody["seatId"];
       if (Number.isNaN(bodySeatId)) {
         body = ERROR_CONSTANTS.INCORRECT_DATA_TYPE;
         break;
@@ -160,7 +159,7 @@ exports.handler = async (event) => {
       orderObject["id"] = generatedOrderId;
       orderObject["seatId"] = bodySeatId;
       orderObject["createdAt"] = time;
-      orderObject["paid"] = false;
+      orderObject["paid"] = { total: 0, paidWith: undefined };
       orderObject["status"] = "pending";
 
       // expire every order object after 8hrs if not completed

@@ -30,7 +30,7 @@ exports.handler = async (event) => {
       }
       // User entered an id of a seat. Check if the seat exists or return an error
       else if (queryParams["id"]) {
-        const seatId = +queryParams["id"];
+        const seatId = queryParams["id"];
         if (Number.isNaN(seatId)) {
           body = ERROR_CONSTANTS.INCORRECT_DATA_TYPE;
           break;
@@ -74,7 +74,7 @@ exports.handler = async (event) => {
         break;
       }
       const action = eventBody["action"].toLowerCase();
-      const id = +eventBody["id"];
+      const id = eventBody["id"];
       if (action !== "sit" && action !== "leave") {
         body = ERROR_CONSTANTS.SEAT_INCORRECT_ACTION;
       } else if (Number.isNaN(id)) {

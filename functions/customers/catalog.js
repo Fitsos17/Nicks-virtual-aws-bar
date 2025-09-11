@@ -14,14 +14,10 @@ exports.handler = async (event) => {
   } else if (!Object.keys("id")) {
     body = ERROR_CONSTANTS.INCORRECT_DATA_TYPE;
   } else {
-    const idParameter = +queryParameters["id"];
-    if (Number.isNaN(idParameter)) {
-      body = ERROR_CONSTANTS.INCORRECT_DATA_TYPE;
-    } else {
-      const drink = await createGetCommand("Catalog", idParameter);
+    const idParameter = queryParameters["id"];
+    const drink = await createGetCommand("Catalog", idParameter);
 
-      body = drink ? drink : ERROR_CONSTANTS.INCORRECT_ID;
-    }
+    body = drink ? drink : ERROR_CONSTANTS.INCORRECT_ID;
   }
 
   return handleReturningOfRouteFunctions(body);
