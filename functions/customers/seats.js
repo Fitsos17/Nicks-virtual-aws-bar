@@ -4,11 +4,11 @@ const {
 } = require("/opt/handleErrorsAndReturning");
 
 const {
-  createScanCommand,
-  createGetCommand,
-  createUpdateCommand,
-  createQueryCommand,
-} = require("/opt/createCommands");
+  sendScanCommand,
+  sendGetCommand,
+  sendUpdateCommand,
+  sendQueryCommand,
+} = require("/opt/sendCommands");
 
 const ACTION_MESSAGES = {
   SAT: {
@@ -25,7 +25,7 @@ exports.handler = async (event) => {
       // User types the id of the seat. If he doesn't, he gets all the seats.
       let queryParams = event["queryStringParameters"];
       if (!queryParams) {
-        body = await createScanCommand("Seats");
+        body = await sendScanCommand("Seats");
         break;
       }
       // User entered an id of a seat. Check if the seat exists or return an error
@@ -36,13 +36,13 @@ exports.handler = async (event) => {
           break;
         }
 
-        const seat = await createGetCommand("Seats", seatId);
+        const seat = await sendGetCommand("Seats", seatId);
         body = seat ? seat : ERROR_CONSTANTS.INCORRECT_ID;
       } else if (queryParams["seatType"]) {
         // use json.parse because value in command
         // will be example `"sunbed"`
         const type = queryParams["seatType"];
-        const result = await createQueryCommand(
+        const result = await sendQueryCommand(
           "Seats",
           "SeatTypeIndex",
           "type",
@@ -87,7 +87,7 @@ exports.handler = async (event) => {
         // if the action is sit, we want the seat to be taken after the request and
         // if the action is leave, we want the seat to not be taken after the request.
         const taken = sit ? true : false;
-        const change = await createUpdateCommand("Seats", id, "taken", taken);
+        const change = await sendUpdateCommand("Seats", id, "taken", taken);
 
         if (change === "PROBLEM") {
           body = ERROR_CONSTANTS.SEAT_INCORRECT_ACTION_OR_ID;

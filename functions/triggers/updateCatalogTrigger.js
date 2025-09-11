@@ -1,4 +1,4 @@
-const { createBatchWriteCommand } = require("/opt/createCommands");
+const { sendBatchWriteCommand } = require("/opt/sendCommands");
 const {
   handleReturningOfUpdateFunctions,
 } = require("/opt/handleErrorsAndReturning");
@@ -89,7 +89,7 @@ exports.handler = async (event) => {
 
   // only 10 items will be imported, so no worries for the limit batch 25
   try {
-    await createBatchWriteCommand("Catalog", items);
+    await sendBatchWriteCommand("Catalog", items);
     return handleReturningOfUpdateFunctions(200, "Catalog");
   } catch (error) {
     return handleReturningOfUpdateFunctions(500, "Catalog", error);

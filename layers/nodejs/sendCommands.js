@@ -1,4 +1,5 @@
 const docClient = require("/opt/docClient");
+
 const {
   BatchWriteCommand,
   ScanCommand,
@@ -31,28 +32,8 @@ const createScanGetInput = (initialInput, attributesToGetArray) => {
   return finalInput;
 };
 
-// for update functions
-exports.createBatchWriteCommand = async (tableName, items) => {
-  try {
-    const input = {
-      RequestItems: {
-        [tableName]: items.map((item) => ({
-          PutRequest: {
-            Item: item,
-          },
-        })),
-      },
-    };
-    const command = new BatchWriteCommand(input);
-
-    await docClient.send(command);
-  } catch (error) {
-    throw new Error(error);
-  }
-};
-
 // get items
-exports.createScanCommand = async (tableName, attributesToGetArray) => {
+exports.sendScanCommand = async (tableName, attributesToGetArray) => {
   try {
     const initialInput = { TableName: tableName };
     const input = createScanGetInput(initialInput, attributesToGetArray);
@@ -67,7 +48,7 @@ exports.createScanCommand = async (tableName, attributesToGetArray) => {
   }
 };
 
-exports.createGetCommand = async (tableName, id, attributesToGetArray) => {
+exports.sendGetCommand = async (tableName, id, attributesToGetArray) => {
   try {
     const initialInput = {
       TableName: tableName,
@@ -86,7 +67,7 @@ exports.createGetCommand = async (tableName, id, attributesToGetArray) => {
   }
 };
 
-exports.createQueryCommand = async (tableName, indexName, pk, value) => {
+exports.sendQueryCommand = async (tableName, indexName, pk, value) => {
   try {
     const input = {
       TableName: tableName,
@@ -110,7 +91,7 @@ exports.createQueryCommand = async (tableName, indexName, pk, value) => {
 };
 
 // update items
-exports.createUpdateCommand = async (tableName, id, attrName, attrValue) => {
+exports.sendUpdateCommand = async (tableName, id, attrName, attrValue) => {
   try {
     const command = new UpdateCommand({
       TableName: tableName,
@@ -141,13 +122,32 @@ exports.createUpdateCommand = async (tableName, id, attrName, attrValue) => {
 };
 
 // create items
-exports.createPutCommand = async (tableName, item) => {
+exports.sendPutCommand = async (tableName, item) => {
   try {
     const input = {
       TableName: tableName,
       Item: item,
     };
     const command = new PutCommand(input);
+    await docClient.send(command);
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+exports.sendBatchWriteCommand = async (tableName, items) => {
+  try {
+    const input = {
+      RequestItems: {
+        [tableName]: items.map((item) => ({
+          PutRequest: {
+            Item: item,
+          },
+        })),
+      },
+    };
+    const command = new BatchWriteCommand(input);
+
     await docClient.send(command);
   } catch (error) {
     throw new Error(error);

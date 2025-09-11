@@ -1,4 +1,4 @@
-const { createGetCommand, createScanCommand } = require("/opt/createCommands");
+const { sendGetCommand, sendScanCommand } = require("/opt/sendCommands");
 const {
   ERROR_CONSTANTS,
   handleReturningOfRouteFunctions,
@@ -10,12 +10,12 @@ exports.handler = async (event) => {
   // User types the id of the drink. If he doesn't, he gets all the drinks.
   const queryParameters = event["queryStringParameters"];
   if (!queryParameters) {
-    body = await createScanCommand("Catalog", ["id", "name"]);
+    body = await sendScanCommand("Catalog", ["id", "name"]);
   } else if (!Object.keys("id")) {
     body = ERROR_CONSTANTS.INCORRECT_DATA_TYPE;
   } else {
     const idParameter = queryParameters["id"];
-    const drink = await createGetCommand("Catalog", idParameter);
+    const drink = await sendGetCommand("Catalog", idParameter);
 
     body = drink ? drink : ERROR_CONSTANTS.INCORRECT_ID;
   }

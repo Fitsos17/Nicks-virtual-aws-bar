@@ -1,8 +1,8 @@
 const {
-  createGetCommand,
-  createPutCommand,
-  createQueryCommand,
-} = require("/opt/createCommands");
+  sendGetCommand,
+  sendPutCommand,
+  sendQueryCommand,
+} = require("/opt/sendCommands");
 const {
   handleReturningOfRouteFunctions,
   ERROR_CONSTANTS,
@@ -45,10 +45,7 @@ exports.handler = async (event) => {
       // the id of the non existant drink.
       const drinkId = drinkObject.drinkId;
       const quantity = +drinkObject.quantity;
-      const drink = await createGetCommand("Catalog", drinkId, [
-        "name",
-        "price",
-      ]);
+      const drink = await sendGetCommand("Catalog", drinkId, ["name", "price"]);
       if (!drink) {
         // if the drink does not exist return an error
         return createErrorFunctions.invalidOrderId(drinkId);
@@ -81,12 +78,12 @@ exports.handler = async (event) => {
       // you can get the orders from other tables and pay for them
       // if you want to. They will like it a lot
       if (orderId) {
-        const order = await createGetCommand("Orders", orderId);
+        const order = await sendGetCommand("Orders", orderId);
         body = order ? order : ERROR_CONSTANTS.ORDERS_INCORRECT_ORDER_ID;
       } else if (seatId) {
         // We do not want to check which person sees the order. Maybe
         // someone else want to pay for the table
-        const ordersBySeat = await createQueryCommand(
+        const ordersBySeat = await sendQueryCommand(
           "Orders",
           "SeatIdIndex",
           "seatId",
@@ -120,7 +117,7 @@ exports.handler = async (event) => {
         body = ERROR_CONSTANTS.INCORRECT_DATA_TYPE;
         break;
       }
-      const foundSeat = await createGetCommand("Seats", bodySeatId, [
+      const foundSeat = await sendGetCommand("Seats", bodySeatId, [
         "id",
         "taken",
       ]);
@@ -166,7 +163,7 @@ exports.handler = async (event) => {
       orderObject["expiresAt"] = Math.floor(Date.now() / 1000) + 8 * 3600;
 
       /* For now I will put items directly to ddb */
-      await createPutCommand("Orders", orderObject);
+      await sendPutCommand("Orders", orderObject);
 
       // 6. Return {"message": "Your order is in the making. In the meantime, you can enjoy the view
       // and pay for your drinks. I hope you will enjoy your drink.",  order: {orderObject}}

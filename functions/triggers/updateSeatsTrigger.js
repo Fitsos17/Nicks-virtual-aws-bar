@@ -1,7 +1,7 @@
 const {
   handleReturningOfUpdateFunctions,
 } = require("/opt/handleErrorsAndReturning");
-const { createBatchWriteCommand } = require("/opt/createCommands");
+const { sendBatchWriteCommand } = require("/opt/sendCommands");
 
 exports.handler = async (event) => {
   const seats = [
@@ -154,7 +154,7 @@ exports.handler = async (event) => {
   ];
 
   try {
-    await createBatchWriteCommand("Seats", seats);
+    await sendBatchWriteCommand("Seats", seats);
     return handleReturningOfUpdateFunctions(200, "Seats");
   } catch (error) {
     return handleReturningOfUpdateFunctions(500, "Seats", error);
